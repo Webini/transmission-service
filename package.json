@@ -23,6 +23,10 @@
     "express": "^4.14.0",
     "multer": "^1.2.0",
     "sequelize": "^3.27.0",
+    "sqlite3": "^3.1.8",
     "transmission": "^0.4.5"
+  },
+  "devDependencies": {
+    "eslint": "^3.11.1"
   }
 }

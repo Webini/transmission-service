@@ -1,2 +1,6 @@
 node_modules
 .env
+data/*.sqlite
+src/config
+sequelize.migrate
+.vscode

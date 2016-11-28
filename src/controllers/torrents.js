@@ -1,5 +1,5 @@
 module.exports = {
-    get: (req, res, next) => {
+    get: function(req, res, next){
         res.json({ 'yolo': 'lalal' });  
     }
 };
