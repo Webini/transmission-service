@@ -1,7 +1,6 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   const Torrent = sequelize.define('Torrent', {
-    hash: DataTypes.STRING(255),
     name: DataTypes.STRING(255),
     eta: DataTypes.INTEGER,
     status: DataTypes.INTEGER,
@@ -33,7 +32,7 @@ module.exports = function(sequelize, DataTypes) {
         Torrent.hasMany(models.File, { 
           onDelete: 'cascade', 
           hooks: true,
-          foreignKey: 'torrentId' 
+          foreignKey: 'torrentHash' 
         });
       }
     },

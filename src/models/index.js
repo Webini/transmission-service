@@ -13,9 +13,9 @@ const sequelize = new Sequelize(
   process.env.DATABASE_PASSWORD,
   {
     dialect: process.env.DATABASE_DIALECT || 'sqlite',
-    logging: process.env.DATABASE_LOGGING || false,
+    logging: !!process.env.DATABASE_LOGGING,
     port: process.env.DATABASE_PORT,
-    storage: `${__dirname}/../../${process.env.DATABASE_STORAGE || 'data/db.sqlite'}`,
+    storage: (process.env.DATABASE_STORAGE === ':memory:' ? ':memory:' : `${__dirname}/../../${process.env.DATABASE_STORAGE || 'data/db.sqlite'}`),
     define: {
       charset: 'utf8',
       collate: 'utf8_general_ci'

@@ -4,7 +4,9 @@ module.exports = function(sequelize, DataTypes) {
     name: DataTypes.TEXT,
     bytesCompleted: DataTypes.BIGINT.UNSIGNED,
     length: DataTypes.BIGINT.UNSIGNED,
-    position: DataTypes.INTEGER.UNSIGNED
+    priority: DataTypes.INTEGER.UNSIGNED,
+    position: DataTypes.INTEGER.UNSIGNED,
+    wanted: DataTypes.BOOLEAN
   }, {
     classMethods: {
       associate: function(models) {

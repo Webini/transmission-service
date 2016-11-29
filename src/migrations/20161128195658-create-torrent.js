@@ -2,14 +2,9 @@
 module.exports = {
   up: function(queryInterface, Sequelize) {
     return queryInterface.createTable('Torrents', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
       hash: {
         type: Sequelize.STRING(255),
+        primaryKey: true,
         allowNull: false
       },
       name: {

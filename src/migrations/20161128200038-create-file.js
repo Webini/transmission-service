@@ -4,14 +4,14 @@ module.exports = {
     return queryInterface.createTable('Files', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        defaultValue: Sequelize.UUIDV4,
+        type: Sequelize.UUID
       },
-      torrentId: {
+      torrentHash: {
         type: Sequelize.INTEGER.UNSIGNED,
         allowNull: false,
-        references: { model: 'Torrents', key: 'id' },
+        references: { model: 'Torrents', key: 'hash' },
         onDelete: 'cascade'
       },
       name: {
@@ -27,9 +27,19 @@ module.exports = {
         type: Sequelize.BIGINT.UNSIGNED,
         allowNull: false
       },
+      priority: {
+        type: Sequelize.INTEGER.UNSIGNED,
+        default: 1,
+        allowNull: false
+      },
       position: {
         type: Sequelize.INTEGER.UNSIGNED,
         default: 0,
+        allowNull: false
+      },
+      wanted: {
+        type: Sequelize.BOOLEAN,
+        default: true,
         allowNull: false
       },
       createdAt: {
