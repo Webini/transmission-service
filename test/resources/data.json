@@ -32,7 +32,7 @@
             "name":"selfish.txt"
          }
       ],
-      "hashString":"aca11111456d83cf9a92048b93d06c4a3d873ce5",
+      "hash":"aca11111456d83cf9a92048b93d06c4a3d873ce5",
       "haveUnchecked":0,
       "haveValid":572489507,
       "id":112,
@@ -107,7 +107,7 @@
             "name":"File 2.txt"
          }
       ],
-      "hashString":"aca11112456d83cf9a92048b93d06c4a3d873ce5",
+      "hash":"aca11112456d83cf9a92048b93d06c4a3d873ce5",
       "haveUnchecked":0,
       "haveValid":572489507,
       "id":113,

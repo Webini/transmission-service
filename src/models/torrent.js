@@ -1,30 +1,119 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   const Torrent = sequelize.define('Torrent', {
-    name: DataTypes.STRING(255),
-    eta: DataTypes.INTEGER,
-    status: DataTypes.INTEGER,
-    error: DataTypes.INTEGER,
-    errorString: DataTypes.STRING(1024),
-    downloadDir: DataTypes.STRING(255),
-    isFinished: DataTypes.BOOLEAN,
-    isStalled: DataTypes.BOOLEAN,
-    desiredAvailable: DataTypes.BIGINT.UNSIGNED,
-    leftUntilDone: DataTypes.BIGINT.UNSIGNED,
-    sizeWhenDone: DataTypes.BIGINT.UNSIGNED,
-    totalSize: DataTypes.BIGINT.UNSIGNED,
-    magnetLink: DataTypes.STRING(2048),
-    uploadedEver: DataTypes.BIGINT,
-    seedRatioLimit: DataTypes.INTEGER,
-    seedRatioMode: DataTypes.INTEGER,
-    uploadRatio: DataTypes.FLOAT,
-    peersConnected: DataTypes.INTEGER.UNSIGNED,
-    peersSendingToUs: DataTypes.INTEGER.UNSIGNED,
-    peersGettingFromUs: DataTypes.INTEGER.UNSIGNED,
-    rateDownload: DataTypes.INTEGER.UNSIGNED,
-    rateUpload: DataTypes.INTEGER.UNSIGNED,
-    activityDate: DataTypes.INTEGER.UNSIGNED,
-    trackersJson: DataTypes.TEXT,
+    hash: {
+      type: DataTypes.STRING,
+      primaryKey: true,
+      unique: true,
+      allowNull: false
+    },
+    name: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    eta: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    },
+    error: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    errorString: {
+      type: DataTypes.STRING(1024),
+      allowNull: true
+    },
+    downloadDir: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    isFinished: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true
+    },
+    isStalled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true
+    },
+    desiredAvailable: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true
+    },
+    leftUntilDone: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true
+    },
+    sizeWhenDone: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true
+    },
+    totalSize: {
+      type: DataTypes.BIGINT.UNSIGNED,
+      allowNull: true
+    },
+    magnetLink: {
+      type: DataTypes.STRING(2048),
+      allowNull: true
+    },
+    uploadedEver: {
+      type: DataTypes.BIGINT
+    },
+    seedRatioLimit: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    seedRatioMode: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0
+    },
+    uploadRatio: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },
+    peersConnected: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true
+    },
+    peersSendingToUs: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true
+    },
+    peersGettingFromUs: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true
+    },
+    rateDownload: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true
+    },
+    rateUpload: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true
+    },
+    activityDate: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true
+    },
+    trackersJson: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
     trackers: DataTypes.VIRTUAL
   }, {
     classMethods: {

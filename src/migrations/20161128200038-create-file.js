@@ -20,7 +20,7 @@ module.exports = {
       },
       bytesCompleted: {
         type: Sequelize.BIGINT.UNSIGNED,
-        default: 0,
+        defaultValue: 0,
         allowNull: false
       },
       length: {
@@ -29,17 +29,17 @@ module.exports = {
       },
       priority: {
         type: Sequelize.INTEGER.UNSIGNED,
-        default: 1,
+        defaultValue: 1,
         allowNull: false
       },
       position: {
         type: Sequelize.INTEGER.UNSIGNED,
-        default: 0,
+        defaultValue: 0,
         allowNull: false
       },
       wanted: {
         type: Sequelize.BOOLEAN,
-        default: true,
+        defaultValue: true,
         allowNull: false
       },
       createdAt: {

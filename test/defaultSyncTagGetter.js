@@ -1,6 +1,6 @@
 /*global describe,it*/
 'use strict';
-require('./common.js');
+
 const defaultSyncTagGetter = require('../src/updater/defaultSyncTagGetter.js');
 const assert               = require('assert');
 

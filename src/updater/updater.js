@@ -1,24 +1,48 @@
 'use strict';
 
-const LOG_PREFIX           = 'UPDATER';
-const winston              = require('winston');
-const models               = require('../models/index.js');
 const defaultSyncTagGetter = require('./defaultSyncTagGetter.js');
+const assert               = require('assert');
+
+function prepareChilds(rawObject, childsConf) {
+  const promises = [];
+
+  for(const field in childsConf) {
+    const conf = childsConf[field];
+    rawObject[field] = new Updater();
+    
+    promises.push(
+      rawObject[field].create(
+        Object.assign({ parent: rawObject }, conf)
+      )
+    );
+  }
+
+  return Promise.all(promises);
+} 
 
 class Updater {
-  create(
-    { queryOptions, modelName, idName, syncTagGetter, childs} 
-    = { syncTagGetter: defaultSyncTagGetter, idName: 'id', childs: {} }
-  ) {
-    this.model         = this.models[modelName];
-    this.idName        = idName;
+  /**
+   * @param {Object} config Configuration object
+   * @param {String} [config.idField=id] Name of the id field of the data array retreived by config.modelDataGetter
+   * @param {Function} config.modelDataGetter Method that give the first revision of the data array ( two default getters are available in this directory allDataGetter.js and oneToManyGetter.js )
+   * @param {Function} [config.syncTagGetter=defaultSyncTagGetter] Method that will generate syncTag for element of the data array
+   * @param {Object} config.childs Associative object with key = field name of an item in data array and value = this config object, it will allow us to make recursive diff
+   * @param {Object} config.parent Used internally for providing parent to modelDataGetter
+   * @todo Rajouter un callback pour créer une entité qui serait ajoutée via le update
+   * @return {Promise}
+   */
+  create(config) {
+    const { modelDataGetter, idField, syncTagGetter, childs, parent } = Object.assign({ 
+      syncTagGetter: defaultSyncTagGetter, 
+      childs: {},
+      idField: 'id'
+    }, config);
+
+    assert(modelDataGetter, 'modelDataGetter is required to use Updater');
+
     this.syncTagGetter = syncTagGetter;
     this.childs        = childs;
-    this.queryOptions  = queryOptions;
-
-    if (!this.model) {
-      throw new Error(`Cannot found model ${modelName}`);
-    }
+    this.idField       = idField;
 
     this.objects = {
       //'objectId' => { object }
@@ -32,10 +56,24 @@ class Updater {
 
     const promises = [];
     promises.push(
-      models
-        .findAll(this.queryOptions)
-        .then((data) => {
+      modelDataGetter(config, parent)
+        .then((elements) => {
+          const ePromises = [];
 
+          elements.forEach((element) => {
+            const id = element[idField];
+            if (id === null || id === undefined) {
+              ePromises.push(Promise.reject(`Cannot found id (${idField}) for element`));
+              return;
+            }
+
+            this.objects[id] = element;
+            ePromises.push(
+              prepareChilds(element, childs)
+            );
+          });
+
+          return Promise.all(ePromises);
         })
     );
 
@@ -43,7 +81,7 @@ class Updater {
              .all(promises)
              .then(() => this);
   }
-
+/*
   static create(modelName, idName) {
 
     return models
@@ -58,7 +96,7 @@ class Updater {
 
                 return new Updater(objectsMap, model, idName);
               });
-  }
+  }*/
 
   update(rawData) {
     // avant de commencer les updates() on doit impérativement avoir un retour de la DB
@@ -86,4 +124,4 @@ class Updater {
 
 }
 
-module.exports = new Updater();
+module.exports = Updater;

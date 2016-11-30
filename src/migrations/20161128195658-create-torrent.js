@@ -3,8 +3,9 @@ module.exports = {
   up: function(queryInterface, Sequelize) {
     return queryInterface.createTable('Torrents', {
       hash: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.STRING,
         primaryKey: true,
+        unique: true,
         allowNull: false
       },
       name: {
@@ -34,12 +35,12 @@ module.exports = {
       },
       isFinished: {
         type: Sequelize.BOOLEAN,
-        defaults: false,
+        defaultValue: false,
         allowNull: true
       },
       isStalled: {
         type: Sequelize.BOOLEAN,
-        defaults: false,
+        defaultValue: false,
         allowNull: true
       },
       desiredAvailable: {
@@ -118,14 +119,14 @@ module.exports = {
       'charset': 'utf8',
       'collate': 'utf8_general_ci'
     }).then(() => {
-      queryInterface.addIndex(
+      /*queryInterface.addIndex(
         'Torrents',
         ['hash'],
         {
           indexName: 'hashUnique',
           indicesType: 'UNIQUE'
         }
-      );
+      );*/
     });
   },
   down: function(queryInterface) {
