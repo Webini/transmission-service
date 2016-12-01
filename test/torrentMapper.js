@@ -29,9 +29,9 @@ describe('torrentMapper', () => {
       hash: 'abc',
       name: testObject.name,
       files: [
-        { name: 'Test', size: 42 },
-        { name: 'Test 1', size: 128 },
-        { name: 'Test 2', size: 256 }
+        { name: 'Test', size: 42, position: 0 },
+        { name: 'Test 1', size: 128, position: 1 },
+        { name: 'Test 2', size: 256, position: 2 }
       ]
     });
   });

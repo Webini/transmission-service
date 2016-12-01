@@ -10,14 +10,6 @@ describe('defaultSyncTagGetter', () => {
     assert.strictEqual(defaultSyncTagGetter(testObject), testObject.updatedAt);
   });
 
-  it('should return customId', () => {
-    const testObject = { customId: 42 };
-    this.idName = 'customId';
-    this.defaultSyncTagGetter = defaultSyncTagGetter;
-
-    assert.strictEqual(this.defaultSyncTagGetter(testObject), testObject.customId);
-  });
-
   it('should throw exception', () => {
     assert.throws(() => {
       defaultSyncTagGetter({});

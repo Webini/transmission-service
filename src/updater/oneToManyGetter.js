@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * creater model getter
+ * create model getter
  * @param {Sequelize.Model} model
  * @param {String} parentIdColumn
  * @param {String} childIdColumn
@@ -14,12 +14,12 @@ module.exports = function(model, parentIdColumn, childIdColumn) {
    */
   return function(conf, rawParent) {
     if (!rawParent) {
-      return Promise.reject('This getter cannot work without parent');
+      return Promise.reject(new Error('This getter cannot work without parent'));
     }
 
     const parentId = rawParent[parentIdColumn];
     if (parentId === null || parentId === undefined) {
-      return Promise.reject('This getter cannot work without parentId defined');
+      return Promise.reject(new Error('This getter cannot work without parentId defined'));
     }
 
     return model.findAll({ 

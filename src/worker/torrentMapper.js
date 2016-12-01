@@ -17,7 +17,7 @@ module.exports = function(torrentData) {
 
   if (filesData instanceof Array && fileStats instanceof Array) {
     torrentData.files = filesData.map((file, i) => {
-      return Object.assign(fileStats[i], file);
+      return Object.assign(fileStats[i], file, { position: i });
     });
   }
 

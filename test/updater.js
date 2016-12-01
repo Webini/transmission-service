@@ -59,50 +59,6 @@ describe('Updater', () => {
     return Promise.all(promises);
   });
 
-  describe('create', () => {
-    const torrentsHashes = [ 'aca11111456d83cf9a92048b93d06c4a3d873ce5', 'aca11112456d83cf9a92048b93d06c4a3d873ce5' ]; 
-    const torrentGetter  = allDataGetterFactory(models.Torrent);
-    const filesGetter    = oneToManyGetterFactory(models.File, 'hash', 'torrentHash');
-    
-
-    it('should not be able to found id column', (done) => {
-      const updater = new Updater();
-      updater.create({
-        modelDataGetter: torrentGetter,
-        idField: 'torrentHash'
-      })
-      .then(() => { done('Results found'); })
-      .catch(() => done());
-    });
-
-    it('should be able to retreive all model datas', (done) => {
-      const updater = new Updater();
-      updater.create({
-        modelDataGetter: torrentGetter,
-        idField: 'hash'
-      }).then((updater) => {
-        mustHave(torrentsHashes, updater.objects, 'hash', done);
-      }).catch(done);
-    });
-
-
-    it('should be able to retreive all model datas and oneToMany fields', (done) => {
-      const updater = new Updater();
-      updater.create({
-        modelDataGetter: torrentGetter,
-        idField: 'hash',
-        childs: {
-          files: {
-            modelDataGetter: filesGetter
-          }
-        }
-      }).then((updater) => {
-        console.log(require('util').inspect(updater.objects, { depth: 10 }));
-        done();
-      }).catch(done);
-    });
-  });
-
   describe('oneToManyGetter.js', () => {
     it('should reject promise because parent unavailable', (done) => {
       const oneToManyGetter = oneToManyGetterFactory(models.File, 'hash', 'torrentHash');
@@ -128,6 +84,76 @@ describe('Updater', () => {
     });
   });
   
+
+  describe('create', () => {
+    const torrentsHashes = [ 'aca11111456d83cf9a92048b93d06c4a3d873ce5', 'aca11112456d83cf9a92048b93d06c4a3d873ce5' ]; 
+    const torrentsFiles  = {
+      'aca11111456d83cf9a92048b93d06c4a3d873ce5': [ 'selfie.png', 'selfish.txt' ],
+      'aca11112456d83cf9a92048b93d06c4a3d873ce5': [ 'File 1.png', 'File 2.txt' ]
+    };
+    const torrentGetter  = allDataGetterFactory(models.Torrent);
+    const filesGetter    = oneToManyGetterFactory(models.File, 'hash', 'torrentHash');
+    
+
+    it('should not be able to found id column', (done) => {
+      const updater = new Updater();
+      updater.create({
+        modelDataGetter: torrentGetter,
+        idField: 'torrentHash'
+      })
+      .then(() => { done('Results found'); })
+      .catch(() => done());
+    });
+
+    it('should be able to retreive all model datas', (done) => {
+      const updater = new Updater();
+      updater.create({
+        modelDataGetter: torrentGetter,
+        idField: 'hash'
+      }).then((updater) => {
+        mustHave(torrentsHashes, updater.objects, 'hash', done);
+      }).catch(done);
+    });
+
+    it('should be able to retreive all model datas and oneToMany fields', (done) => {
+      const updater = new Updater();
+      updater.create({
+        modelDataGetter: torrentGetter,
+        idField: 'hash',
+        childs: {
+          files: {
+            modelDataGetter: filesGetter
+          }
+        }
+      }).then((updater) => {
+        const torrents = updater.objects;
+        console.log('Torrents => ', require('util').inspect(torrents, { showHidden: true }));
+        mustHave(torrentsHashes, torrents, 'hash', (err) => {
+          if (!err) {
+            let successfull = 0;
+            let count = 0;
+
+            for (const hash in torrents) {
+              count++;
+              const torrent = torrents[hash];
+              
+              mustHave(torrentsFiles[hash], torrent.files.objects, 'name', (err) => {
+                if (!err) {
+                  successfull++;
+                }
+              });
+            }
+
+            if (successfull === count) {
+              return done();
+            }
+          } 
+
+          done('Invalid data');
+        });
+      }).catch(done);
+    });
+  });
 
   afterEach(() => {
     return models.Torrent.truncate();
