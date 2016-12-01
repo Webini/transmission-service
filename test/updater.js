@@ -3,6 +3,9 @@
 
 const oneToManyGetterFactory = require('../src/updater/oneToManyGetter.js');
 const allDataGetterFactory   = require('../src/updater/allDataGetter.js');
+const modelDeleteFactory     = require('../src/updater/modelDeleteFactory.js');
+const modelCreateFactory     = require('../src/updater/modelCreateFactory.js');
+const modelUpdateFactory     = require('../src/updater/modelUpdateFactory.js');
 const models  = require('../src/models/index.js'); 
 const data    = require('./resources/data.json');
 const Updater = require('../src/updater/updater.js');
@@ -115,19 +118,46 @@ describe('Updater', () => {
       }).catch(done);
     });
 
-    it('should be able to retreive all model datas and oneToMany fields', (done) => {
+    it.only('should be able to retreive all model datas and oneToMany fields', (done) => {
       const updater = new Updater();
       updater.create({
         modelDataGetter: torrentGetter,
+        //these database shit are potentially death bottleneck
+        modelCreateCb: modelCreateFactory(models.Torrent),
+        modelDeleteCb: modelDeleteFactory(models.Torrent, 'hash'),
+        modelUpdateCb: modelUpdateFactory(models.Torrent, 'hash', [ 'files' ]),
         idField: 'hash',
         childs: {
           files: {
-            modelDataGetter: filesGetter
+            idField: 'name',
+            modelDataGetter: filesGetter,
+            modelCreateCb: function(rawElement, rawParent) {
+              return models.File
+                .create(Object.assign({ torrentHash: rawParent.hash }, rawElement))
+                .then((element) => element.toJSON());
+            },
+            modelUpdateCb: modelUpdateFactory(models.File),
+            modelDeleteCb: modelDeleteFactory(models.File),
+            syncTagGetter: function(el) {
+              return el.bytesCompleted;
+            }
           }
         }
       }).then((updater) => {
-        const torrents = updater.objects;
-        console.log('Torrents => ', require('util').inspect(torrents, { showHidden: true }));
+        return updater.update([{
+          "hash":"aca11112456d83cf9a92048b93d06c4a3d873ce5",
+          "files":[  
+            {  
+                "bytesCompleted":15,
+                "length":175718,
+                "name":"File 1.png"
+            },
+          ],
+          "updatedAt": "0000-00-00 00:00:00"
+        }]);
+      }).then((updater) => {
+        const torrents = updater.elements;
+        console.log('Torrents => ', require('util').inspect(torrents, { showHidden: true, depth: 10 }));
         mustHave(torrentsHashes, torrents, 'hash', (err) => {
           if (!err) {
             let successfull = 0;
@@ -137,7 +167,7 @@ describe('Updater', () => {
               count++;
               const torrent = torrents[hash];
               
-              mustHave(torrentsFiles[hash], torrent.files.objects, 'name', (err) => {
+              mustHave(torrentsFiles[hash], torrent.files.elements, 'name', (err) => {
                 if (!err) {
                   successfull++;
                 }

@@ -15,6 +15,10 @@ function prepareChilds(rawObject, childsConf) {
       rawObject[conf.symbol].create(
         Object.assign({ parent: rawObject }, conf)
       ).then((updater) => {
+                          //DMC le hashmap, on pourra pas utiliser une ref => donc faire
+                          //des op relou pour update ce caca, ou partir sur une méthode  .toObject
+                          //et roulez les mappings a ce moment
+                          //sauf que si j'ai une promise en attente le state est potentiellement cassé
         rawObject[field] = updater.elements;
       })
     );
@@ -88,7 +92,6 @@ class Updater {
    * @param {Callback} [config.syncTagGetter=defaultSyncTagGetter] Method that will generate syncTag for element of the elemnts array
    * @param {Object} config.childs Associative object with key = field name of an item in elements array and value = this config object, it will allow us to make recursive diff
    * @param {Object} config.parent Used internally for providing parent to modelDataGetter
-   * @param {Array} [config.preserveFields=[]] Fields to preserve from original element
    * @param {Callback} modelCreateCb Callback to create a new element, it will have the raw data received in update and the parent if available in parameters, and must return an es6 promise with the new data values
    * @param {Callback} modelDeleteCb Callback to delete an element, it will have the raw data of the last version of the element and the parent if available as parameters, and must return an es6 promise
    * @param {Callback} modelUpdateCb Callback to update an element, it will have the raw data of the reference element, the raw data of the new element and the parent if available, it must return an es6 promise with the new data values
@@ -98,13 +101,12 @@ class Updater {
   create(config) {
     const { 
       modelDataGetter, idField, syncTagGetter, 
-      childs, parent, preserveFields, modelCreateCb,
-      modelDeleteCb, modelUpdateCb
+      childs, parent, modelCreateCb, modelDeleteCb, 
+      modelUpdateCb
     } = Object.assign({ 
       syncTagGetter: defaultSyncTagGetter, 
       childs: {},
-      idField: 'id',
-      preserveFields: []
+      idField: 'id'
     }, config);
 
     assert(modelDataGetter, 'modelDataGetter is required to use Updater');
@@ -115,9 +117,9 @@ class Updater {
     this.syncTagGetter  = syncTagGetter;
     this.childs         = childs;
     this.idField        = idField;
-    this.preserveFields = preserveFields;
     this.modelDeleteCb  = modelDeleteCb;
     this.modelCreateCb  = modelCreateCb;
+    this.modelUpdateCb  = modelUpdateCb;
     this.parent         = parent;
     this.objects        = { /* 'objectId' => { object } */ };
     this.objectsIds     = []; //array des ids de nos objets
@@ -230,12 +232,12 @@ class Updater {
   }
 
   update(newElements) {
+    newElements = newElements || [];
     // avant de commencer les updates() on doit impérativement avoir un retour de la DB
     return new Promise((resolve) => {
       //processing des syncTags
       applySyncTags(newElements, this.syncTagGetter);
-      //list les IDs dispo
-      const rawIds   = extractIds(newElements);
+      
       const toAdd    = [];
       const done     = [];
       const promises = [];
@@ -243,24 +245,27 @@ class Updater {
       for(const i in newElements) {
         const newElement = newElements[i];
         const id         = getId(newElements[i], this.idField, false);
-        //newElement can really be new if id is unset or if we haven't the element
-        //in our array (in the case of third party id generation). 
+        /**
+         * newElement can be new if id is unset or if we haven't the element
+         * in our array (in the case of third party id generation).
+         * */ 
         if (id === null || !this.objects[id]) {
           toAdd.push(newElement);
           continue;
         }
 
         const referenceElement = this.objects[id];
-
+        
         //check si notre syncTag a changé 
         if (newElement[syncTagSymbol] !== referenceElement[syncTagSymbol]) {
           promises.push(this._updateElement(referenceElement, newElement));
-          done.push(id);
         }
+        
+        done.push(id);
       }
 
       const deletedElements = this.objectsIds.filter((id) => {
-        return (done.indexof(id) === -1);
+        return (done.indexOf(id) === -1);
       });
 
       deletedElements.forEach((id) => {
@@ -272,8 +277,14 @@ class Updater {
         promises.push(this._create(element));
       });
 
-      this.objectsIds = rawIds;
-      resolve(Promise.all(promises));
+      resolve(
+        Promise
+          .all(promises)
+          .then(() => {
+            this.objectsIds = extractIds(this.objects, this.idField);
+            return this;
+          })
+      );
     });
   }
 

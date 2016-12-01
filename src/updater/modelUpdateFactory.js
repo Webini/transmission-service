@@ -4,10 +4,10 @@
  * create a new model updater 
  * @param {Sequelize.Model} model
  * @param {String} idField Model id field
- * @param {Array[String]} preserveFields oldElement fields to preserve after update
+ * @param {Array[String]} preserveFields newElement fields to preserve after update
  * @return {Function}
  */
-module.exports = function(model, idField, preserveFields = []) {
+module.exports = function(model, idField = 'id', preserveFields = []) {
   /**
    * It should always return a promise 
    * @return {Promise}
@@ -26,7 +26,7 @@ module.exports = function(model, idField, preserveFields = []) {
         const output = element.toJSON();
         
         preserveFields.forEach((field) => {
-          output[field] = oldElement[field];
+          output[field] = newElement[field];
         });
 
         return output;
