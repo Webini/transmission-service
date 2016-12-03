@@ -7,9 +7,7 @@
 module.exports = function(torrentData) {
   const fileStats = torrentData.fileStats;
   const filesData = torrentData.files;
-  torrentData.hash = torrentData.hashString;
-
-  delete torrentData.hashString;
+  
   delete torrentData.fileStats;
   delete torrentData.files;
   
@@ -20,6 +18,9 @@ module.exports = function(torrentData) {
       return Object.assign(fileStats[i], file, { position: i });
     });
   }
+
+  torrentData.hash = torrentData.hashString;
+  delete torrentData.hashString;
 
   return torrentData;
 };

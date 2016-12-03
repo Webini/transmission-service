@@ -5,18 +5,31 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
+        unique: true,
         defaultValue: Sequelize.UUIDV4,
         type: Sequelize.UUID
       },
       torrentHash: {
-        type: Sequelize.INTEGER.UNSIGNED,
+        type: Sequelize.STRING(40),
         allowNull: false,
         references: { model: 'Torrents', key: 'hash' },
         onDelete: 'cascade'
       },
       name: {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING(5120),
         allowNull: false
+      },
+      basename: {
+        type: Sequelize.STRING(1024),
+        allowNull: true,
+      },
+      directory: {
+        type: Sequelize.STRING(4096),
+        allowNull: true
+      },
+      extension: {
+        type: Sequelize.STRING(128),
+        allowNull: true
       },
       bytesCompleted: {
         type: Sequelize.BIGINT.UNSIGNED,

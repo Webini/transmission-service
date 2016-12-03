@@ -19,6 +19,37 @@ module.exports = function(model, idField = 'id', preserveFields = []) {
       return Promise.reject(new Error(`Id ${idField} not found`));
     }
 
+    return model.update(newElement, { 
+      where: {
+        [idField]: oldElement[idField],
+      }
+    }).then(() => {
+      const output = Object.assign({}, oldElement);
+
+      for (const key in output) {
+        if (newElement[key] !== undefined) {
+          output[key] = newElement[key];
+        }
+      }
+
+      preserveFields.forEach((field) => {
+        output[field] = newElement[field];
+      });
+
+      return output;
+    });
+  };
+};
+
+/**
+ * 
+  return function(oldElement, newElement, parent) {
+    const id = oldElement[idField];
+    
+    if (id === null || id === undefined) {
+      return Promise.reject(new Error(`Id ${idField} not found`));
+    }
+
     return model
       .findById(oldElement[idField])
       .then((element) => element.update(newElement))
@@ -32,4 +63,4 @@ module.exports = function(model, idField = 'id', preserveFields = []) {
         return output;
       });
   };
-};
+ */

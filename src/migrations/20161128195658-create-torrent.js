@@ -3,7 +3,7 @@ module.exports = {
   up: function(queryInterface, Sequelize) {
     return queryInterface.createTable('Torrents', {
       hash: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(40),
         primaryKey: true,
         unique: true,
         allowNull: false

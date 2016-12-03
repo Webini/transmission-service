@@ -16,7 +16,7 @@ module.exports = function(model, preserveFields = []) {
       .create(rawElement)
       .then((element) => {
         const output = element.toJSON();
-
+        
         preserveFields.forEach((field) => {
           output[field] = rawElement[field];
         });

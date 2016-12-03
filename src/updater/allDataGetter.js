@@ -11,6 +11,11 @@ module.exports = function(model) {
    * @return {Promise}
    */
   return function(conf, rawParent) {
-    return model.findAll({ raw: true });
+    return model.findAll()
+      .then((elements) => {
+        return elements.map((element) => {
+          return element.toJSON();
+        });
+      });
   };
 };

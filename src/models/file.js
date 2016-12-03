@@ -1,21 +1,36 @@
 'use strict';
+const path = require('path');
+
 module.exports = function(sequelize, DataTypes) {
   const File = sequelize.define('File', {
     id: {
       allowNull: false,
+      unique: true,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
       type: DataTypes.UUID
     },
     torrentHash: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.STRING(40),
       allowNull: false,
       references: { model: 'Torrents', key: 'hash' },
       onDelete: 'cascade'
     },
     name: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING(5120),
       allowNull: false
+    },
+    basename: {
+      type: DataTypes.STRING(1024),
+      allowNull: true,
+    },
+    directory: {
+      type: DataTypes.STRING(4096),
+      allowNull: true
+    },
+    extension: {
+      type: DataTypes.STRING(128),
+      allowNull: true
     },
     bytesCompleted: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -55,6 +70,18 @@ module.exports = function(sequelize, DataTypes) {
         File.belongsTo(models.Torrent, {
           onDelete: 'CASCADE'
         });
+      }
+    },
+    setterMethods: {
+      name: function(value) {
+        const directory = path.dirname(value);
+        const extension = path.extname(value);
+        const basename  = path.basename(value);
+
+        this.setDataValue('directory', (directory === '.' ? null : directory));
+        this.setDataValue('basename', (basename.length <= 0 ? null : basename));
+        this.setDataValue('extension', (extension.length > 0 ? extension.substring(1) : null));
+        this.setDataValue('name', value);
       }
     }
   });

@@ -89,41 +89,43 @@ describe('Updater', () => {
   
 
   describe('create', () => {
-    const torrentsHashes = [ 'aca11111456d83cf9a92048b93d06c4a3d873ce5', 'aca11112456d83cf9a92048b93d06c4a3d873ce5' ]; 
-    const torrentsFiles  = {
-      'aca11111456d83cf9a92048b93d06c4a3d873ce5': [ 'selfie.png', 'selfish.txt' ],
-      'aca11112456d83cf9a92048b93d06c4a3d873ce5': [ 'File 1.png', 'File 2.txt' ]
-    };
     const torrentGetter  = allDataGetterFactory(models.Torrent);
     const filesGetter    = oneToManyGetterFactory(models.File, 'hash', 'torrentHash');
     
-
     it('should not be able to found id column', (done) => {
-      const updater = new Updater();
-      updater.create({
+      const updater = new Updater({
         modelDataGetter: torrentGetter,
-        idField: 'torrentHash'
-      })
-      .then(() => { done('Results found'); })
-      .catch(() => done());
+        idField: 'torrentHash',
+        modelCreateCb: modelCreateFactory(models.Torrent, [ 'files' ]),
+        modelDeleteCb: modelDeleteFactory(models.Torrent, 'hash'),
+        modelUpdateCb: modelUpdateFactory(models.Torrent, 'hash'),
+      });
+
+      updater.init()
+        .then(() => { done('Results found'); })
+        .catch(() => done());
     });
 
     it('should be able to retreive all model datas', (done) => {
-      const updater = new Updater();
-      updater.create({
+      const updater = new Updater({
         modelDataGetter: torrentGetter,
-        idField: 'hash'
-      }).then((updater) => {
+        idField: 'hash',
+        modelCreateCb: modelCreateFactory(models.Torrent, [ 'files' ]),
+        modelDeleteCb: modelDeleteFactory(models.Torrent, 'hash'),
+        modelUpdateCb: modelUpdateFactory(models.Torrent, 'hash'),
+      });
+      
+      updater.init().then((updater) => {
+        const torrentsHashes = [ 'aca11111456d83cf9a92048b93d06c4a3d873ce5', 'aca11112456d83cf9a92048b93d06c4a3d873ce5' ]; 
         mustHave(torrentsHashes, updater.objects, 'hash', done);
       }).catch(done);
     });
 
-    it.only('should be able to retreive all model datas and oneToMany fields', (done) => {
-      const updater = new Updater();
-      updater.create({
+    it('should be able to retreive all model datas and oneToMany fields', (done) => {
+      const updater = new Updater({
         modelDataGetter: torrentGetter,
         //these database shit are potentially death bottleneck
-        modelCreateCb: modelCreateFactory(models.Torrent),
+        modelCreateCb: modelCreateFactory(models.Torrent, [ 'files' ]),
         modelDeleteCb: modelDeleteFactory(models.Torrent, 'hash'),
         modelUpdateCb: modelUpdateFactory(models.Torrent, 'hash', [ 'files' ]),
         idField: 'hash',
@@ -143,31 +145,42 @@ describe('Updater', () => {
             }
           }
         }
-      }).then((updater) => {
+      });
+      
+      updater.init().then((updater) => {
         return updater.update([{
-          "hash":"aca11112456d83cf9a92048b93d06c4a3d873ce5",
-          "files":[  
+          hash: 'aca11112456d83cf9a92048b93d06c4a3d873ce5',
+          files: [  
             {  
-                "bytesCompleted":15,
-                "length":175718,
-                "name":"File 1.png"
+              bytesCompleted: 15,
+              length: 175718,
+              name: 'File 1.png'
+            },
+            {  
+              bytesCompleted: 64,
+              length: 128,
+              name: 'This is new.txt'
             },
           ],
-          "updatedAt": "0000-00-00 00:00:00"
+          updatedAt: '0000-00-00 00:00:00'
         }]);
       }).then((updater) => {
         const torrents = updater.elements;
-        console.log('Torrents => ', require('util').inspect(torrents, { showHidden: true, depth: 10 }));
+        const torrentsHashes = [ 'aca11112456d83cf9a92048b93d06c4a3d873ce5' ]; 
+        const torrentsFiles  = {
+          'aca11112456d83cf9a92048b93d06c4a3d873ce5': [ 'File 1.png', 'This is new.txt' ]
+        };
+        
         mustHave(torrentsHashes, torrents, 'hash', (err) => {
           if (!err) {
             let successfull = 0;
             let count = 0;
 
-            for (const hash in torrents) {
+            for (const i in torrents) {
               count++;
-              const torrent = torrents[hash];
+              const torrent = torrents[i];
               
-              mustHave(torrentsFiles[hash], torrent.files.elements, 'name', (err) => {
+              mustHave(torrentsFiles[torrent.hash], torrent.files, 'name', (err) => {
                 if (!err) {
                   successfull++;
                 }

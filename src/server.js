@@ -1,6 +1,5 @@
 'import strict';
 
-require('dotenv').config();
 const express     = require('express');
 const bodyParser  = require('body-parser');
 const multer      = require('multer');

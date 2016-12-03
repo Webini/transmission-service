@@ -2,7 +2,7 @@
 module.exports = function(sequelize, DataTypes) {
   const Torrent = sequelize.define('Torrent', {
     hash: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(40),
       primaryKey: true,
       unique: true,
       allowNull: false
@@ -126,13 +126,19 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     getterMethods: {
+      trackersJson: () => undefined,
       trackers: function(){
         try {
-          return JSON.parse(this.trackersJson);
+          return JSON.parse(this.getDataValue('trackersJson'));
         } catch(e) {
           return [];
         }
       },
+    },
+    setterMethods: {
+      trackers: function(data){
+        this.setDataValue('trackersJson', JSON.stringify(data));    
+      }
     }
   });
   return Torrent;
