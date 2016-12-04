@@ -1,12 +1,13 @@
 'use strict';
 
-const torrent  = require('./controllers/torrent.js');
-const torrents = require('./controllers/torrents.js');
+const torrent     = require('./controllers/torrent.js');
+const torrents    = require('./controllers/torrents.js');
+const bodyParser  = require('body-parser');
 
-module.exports = function (app) {
+module.exports = function (app, multer) {
   app.get('/', torrents.get);
-  app.post('/torrent', torrents.addTorrent);
-  app.post('/url', torrents.addTorrentUrl);
+  app.post('/torrent', multer.single('torrent'), bodyParser.text(), torrents.addTorrent);
+  app.post('/url', bodyParser.json(), torrents.addTorrentUrl);
 
   app.get('/:hash([a-zA-Z0-9]{40})', torrent.get);
   app.post('/:hash([a-zA-Z0-9]{40})/pause', torrent.pause);

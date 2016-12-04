@@ -1,16 +1,18 @@
 'import strict';
 
 const express     = require('express');
-const bodyParser  = require('body-parser');
 const multer      = require('multer');
 const routes      = require('./routes.js');
 
 const app         = express();
 const server      = require('http').Server(app);
+const apiRender   = require('./middlewares/apiRender.js');
 
-app.use(bodyParser.json());
-app.use(multer({ dest: process.env.UPLOAD_PATH || '/var/tmp/transmission-uploads' }).single('torrent'));
+app.use(apiRender);
 
-routes(app);
+routes(
+  app, 
+  multer({ dest: process.env.UPLOAD_PATH || '/var/tmp/transmission-uploads' })
+);
 
 module.exports = server;

@@ -2,37 +2,30 @@
 
 const transmission = require('../transmission/api.js');
 const updater      = require('../updater.js');
-const winston      = require('winston');
 const LOG_PREFIX   = 'TORRENT_CTRL';
 
 module.exports = {
-  get: function(req, res, next) {
+  get: function(req, res) {
     const torrent = updater.get(req.params.hash);
     if (torrent === null) {
-      res.status(404).send();
+      res.apiError(LOG_PREFIX, 'Resource not found', null, 404);
     } else {
-      res.json(updater.get(req.params.hash));  
+      res.apiSuccess(updater.get(req.params.hash));  
     }
   },
-  pause: function(req, res, next) {
+  pause: function(req, res) {
     transmission
       .stopAsync([ req.params.hash ])
-      .then(() => res.json(true))
-      .catch((err) => {
-        winston.error(LOG_PREFIX, err);
-        res.status(500).send();
-      });
+      .then(() => res.apiSuccess(true))
+      .catch((err) => res.apiError(LOG_PREFIX, 'Unknown error', err));
   },
-  start: function(req, res, next) {
+  start: function(req, res) {
     transmission
       .startAsync([ req.params.hash ])
-      .then(() => res.json(true))
-      .catch((err) => {
-        winston.error(LOG_PREFIX, err);
-        res.status(500).send();
-      });
+      .then(() => res.apiSuccess(true))
+      .catch((err) => res.apiError(LOG_PREFIX, 'Unknown error', err));
   },
-  ratio: function(req, res, next) {
+  ratio: function(req, res) {
     transmission
       .setAsync(
         [ req.params.hash ],
@@ -41,19 +34,13 @@ module.exports = {
           seedRatioMode: 1
         }
       )
-      .then(() => res.json(true))
-      .catch((err) => {
-        winston.error(LOG_PREFIX, err);
-        res.status(500).send();
-      });
+      .then(() => res.apiSuccess(true))
+      .catch((err) => res.apiError(LOG_PREFIX, 'Unknown error', err));
   },
-  remove: function(req, res, next) {
+  remove: function(req, res) {
     transmission
       .removeAsync([ req.params.hash ], true)
       .then(() => res.json(true))
-      .catch((err) => {
-        winston.error(LOG_PREFIX, err);
-        res.status(500).send();
-      });
+      .catch((err) => res.apiError(LOG_PREFIX, 'Unknown error', err));
   }
 };
