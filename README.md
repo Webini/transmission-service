@@ -6,7 +6,7 @@ SERVER
 
 To start server simply use
 ```
-node server.json
+node server.js
 ```
 
 Parameters available  :
