@@ -11,6 +11,8 @@ ENV TRANSMISSION_PORT=9091
 ENV TRANSMISSION_USER=transmission
 ENV TRANSMISSION_PASSWORD=transmission
 
+VOLUME [ "/home/node/transmission-service/data" ]
+
 ADD "src" "/home/node/transmission-service/src"
 ADD [ \
   "package.json", \
@@ -18,7 +20,6 @@ ADD [ \
   "/home/node/transmission-service/" \
 ]
 
-RUN mkdir /home/node/transmission-service/data
 RUN chown -R node. /home/node/transmission-service
 
 USER node
@@ -28,6 +29,5 @@ RUN mkdir /var/tmp/transmission-uploads && \
     touch .env && \
     npm i 
 
-VOLUME [ "/home/node/transmission-service/data" ]
 EXPOSE 8080
 CMD [ "node", "server.js", "--run-with-migrations" ]

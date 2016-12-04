@@ -4,9 +4,9 @@ const EventEmitter         = require('events');
 const defaultSyncTagGetter = require('./defaultSyncTagGetter.js');
 const assert               = require('assert');
 const EVENTS = {
-  CREATED: 'create',
-  UPDATED: 'update',
-  DELETED: 'delete'
+  CREATED: 'created',
+  UPDATED: 'updated',
+  DELETED: 'deleted'
 };
 
 function prepareChilds(rawObject, childsConf) {
@@ -240,12 +240,18 @@ class Updater {
       });
   }
 
-  _create(element) {
+  _create(element, dispatchEvent) {
     this.objects.push(element);
     
     return prepareChilds(element, this.childs) //create the childs updater
       .then(() => {
         const promises = [];
+
+        applySyncTag(element, this.syncTagGetter, this.syncTagField);
+
+        if (dispatchEvent) {
+          this.emitter.emit(EVENTS.CREATED, element);
+        }
 
         //update childs updater with provided data
         for (const key in this.childs) {
@@ -265,7 +271,6 @@ class Updater {
           }
         }
 
-        applySyncTag(element, this.syncTagGetter, this.syncTagField);
         return Promise.all(promises);
       });
   }
@@ -278,10 +283,7 @@ class Updater {
   _createElement(rawElement) {
     return this.modelCreateCb(rawElement, this.parent)
                .then((element) => {
-                 return this._create(element)
-                   .then(() => {
-                     this.emitter.emit(EVENTS.CREATED, element);
-                   });
+                 return this._create(element, true);
                });
   }
 

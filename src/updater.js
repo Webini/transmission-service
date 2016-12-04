@@ -8,30 +8,38 @@ const modelDeleteFactory     = require('./updater/modelDeleteFactory.js');
 const modelCreateFactory     = require('./updater/modelCreateFactory.js');
 const modelUpdateFactory     = require('./updater/modelUpdateFactory.js');
 const crc32                  = require('crc').crc32;
-const EventEmitter           = require('events');
+const TorrentEmitter         = require('./emitters/torrent.js');
+const FileEmitter            = require('./emitters/file.js');
 
-const torrentEmitter = new EventEmitter();
-const filesEmitter   = new EventEmitter();
-/*
-torrentEmitter.on(Updater.EVENTS.CREATED, (element) => {
-  console.log(`Torrent ${element.name} created #${element.hash}`);
+const torrentEmitter = new TorrentEmitter();
+const filesEmitter   = new FileEmitter();
+
+torrentEmitter.on(TorrentEmitter.EVENTS.CREATED, (event) => {
+  console.log(`Torrent ${event.data.name} created #${event.objectId}`);
+});/*
+torrentEmitter.on(TorrentEmitter.EVENTS.UPDATED, (event) => {
+  console.log(`Torrent ${event.data.new.name} updated #${event.objectId}`);
+});*/
+torrentEmitter.on(TorrentEmitter.EVENTS.DOWNLOADED, (event) => {
+  console.log(`Torrent ${event.data.name} downloaded #${event.objectId}`);
 });
-torrentEmitter.on(Updater.EVENTS.UPDATED, (element) => {
-  console.log(`Torrent ${element.name} updated #${element.hash}`);
+torrentEmitter.on(TorrentEmitter.EVENTS.DELETED, (event) => {
+  console.log(`Torrent ${event.data.name} deleted #${event.objectId}`);
 });
-torrentEmitter.on(Updater.EVENTS.DELETED, (element) => {
-  console.log(`Torrent ${element.name} deleted #${element.hash}`);
+
+filesEmitter.on(FileEmitter.EVENTS.CREATED, (event) => {
+  console.log(`File ${event.data.name} created #${event.objectId}`);
+});/*
+filesEmitter.on(FileEmitter.EVENTS.UPDATED, (event) => {
+  console.log(`File ${event.data.new.name} updated #${event.objectId}`);
+});*/
+filesEmitter.on(FileEmitter.EVENTS.DELETED, (event) => {
+  console.log(`File ${event.data.name} deleted #${event.objectId}`);
 });
-filesEmitter.on(Updater.EVENTS.CREATED, (element) => {
-  console.log(`File ${element.name} created #${element.id}`);
+filesEmitter.on(FileEmitter.EVENTS.DOWNLOADED, (event) => {
+  console.log(`File ${event.data.name} downloaded #${event.objectId}`);
 });
-filesEmitter.on(Updater.EVENTS.UPDATED, (element) => {
-  console.log(`File ${element.name} updated #${element.id}`);
-});
-filesEmitter.on(Updater.EVENTS.DELETED, (element) => {
-  console.log(`File ${element.name} deleted #${element.id}`);
-});
-*/
+
 module.exports = new Updater({
   emitter: torrentEmitter,
   modelDataGetter: allDataGetterFactory(models.Torrent),

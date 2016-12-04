@@ -2,7 +2,7 @@
 
 const transmission = require('../transmission/api.js');
 const updater      = require('../updater.js');
-const LOG_PREFIX   = 'TORRENT_CTRL';
+const LOG_PREFIX   = 'TorrentController';
 
 module.exports = {
   get: function(req, res) {

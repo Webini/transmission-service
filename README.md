@@ -59,11 +59,43 @@ Environment variables available :
 | DATABASE_LOGGING        | 0              | Database logging, it will output all queries |
 | DATABASE_PORT           |                | Database port |
 | DATABASE_STORAGE        | data/db.sqlite | Database storage ( used for sqlite ), use relative path starting from this project directory |
-  
+| RABBITMQ_URL            |                | RabbitMQ url, this parameter is not required it will not fire events |
+| RABBITMQ_EXCHANGE       | amq.topic      | RabbitMQ exchange name | 
 ## Volumes
    
 By default the dockerfile expose the database storage ( `/home/node/transmission-service/data` )  
-  
+If you are mounting this directory don't forget to set his uid & guid at 1000 since node application is not running as root.  
+
 ## Ports
   
 8080
+
+
+RABBITMQ   
+--------  
+If environment variable RABBITMQ_URL is set, this server will publish events to rabbitmq.
+
+## Event object
+| Field    | Description                         |
+| -------- | ----------------------------------- |
+| date     | Event creation date                 |
+| data     | Event data, see description below   |
+| type     | Event type, same as routing key     |
+| objectId | ObjectId associated with this event |
+
+
+
+## Routing key and events content associated 
+
+| Routing key        | Data field | Description |
+| ------------------ | ---------- | ----------- | 
+| file.created       | Same structure as file model | Fired when a new file is created | 
+| file.updated       | ```{ new: { File model }, old: { File model }, diff: { field => value that differ from old model } }``` | Fired when the file is updated |
+| file.deleted       | Same structure as file model | Fired when the file is deleted |
+| file.downloaded    | Same structure as file model | Fired when the file has finished downloading |
+| torrent.created    | Same structure as torrent model | Fired when a new torrent is created | 
+| torrent.updated    | ```{ new: { torrent model }, old: { torrent model }, diff: { field => value that differ from old model } }``` | Fired when the torrent is updated |
+| torrent.deleted    | Same structure as torrent model | Fired when the torrent is deleted |
+| torrent.downloaded | Same structure as torrent model | Fired when the torrent has finished downloading |
+
+
