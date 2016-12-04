@@ -20,14 +20,15 @@
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
     "crc": "^3.4.3",
-    "deep-diff": "^0.3.4",
     "dotenv": "^2.0.0",
     "express": "^4.14.0",
     "multer": "^1.2.0",
     "sequelize": "^3.27.0",
     "sqlite3": "^3.1.8",
     "transmission": "^0.4.5",
-    "winston": "^2.3.0"
+    "umzug": "^1.11.0",
+    "winston": "^2.3.0",
+    "yargs": "^6.5.0"
   },
   "devDependencies": {
     "eslint": "^3.11.1",
