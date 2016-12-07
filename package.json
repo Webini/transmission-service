@@ -35,7 +35,6 @@
   },
   "devDependencies": {
     "eslint": "^3.11.1",
-    "mocha": "^3.2.0",
-    "umzug": "^1.11.0"
+    "mocha": "^3.2.0"
   }
 }

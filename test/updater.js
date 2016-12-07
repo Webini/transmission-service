@@ -38,6 +38,8 @@ const mustHave = function(elements, compare, field, cb) {
 };
 
 describe('Updater', () => {
+  const torrentGetter  = allDataGetterFactory(models.Torrent);
+
   before(() => {
     return umzug.up();
   });
@@ -90,7 +92,6 @@ describe('Updater', () => {
 
   describe('create', () => {
     const torrentGetter  = allDataGetterFactory(models.Torrent);
-    const filesGetter    = oneToManyGetterFactory(models.File, 'hash', 'torrentHash');
     
     it('should not be able to found id column', (done) => {
       const updater = new Updater({
@@ -120,8 +121,12 @@ describe('Updater', () => {
         mustHave(torrentsHashes, updater.objects, 'hash', done);
       }).catch(done);
     });
+  });
 
-    it('should be able to retreive all model datas and oneToMany fields', (done) => {
+  describe('update', () => {
+    const filesGetter    = oneToManyGetterFactory(models.File, 'hash', 'torrentHash');
+
+    it('should be able to update recursive', (done) => {
       const updater = new Updater({
         modelDataGetter: torrentGetter,
         //these database shit are potentially death bottleneck

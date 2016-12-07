@@ -46,7 +46,7 @@ class TorrentEmitter extends EventEmitter {
       type: EVENTS.UPDATED,
       objectId: newElement.hash
     });
-
+    
     if (differences['leftUntilDone'] !== undefined && 
         oldElement['leftUntilDone'] > 0 && 
         newElement['leftUntilDone'] === 0) {

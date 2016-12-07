@@ -12,7 +12,7 @@ const sequelize = new Sequelize(
   process.env.DATABASE_PASSWORD,
   {
     dialect: process.env.DATABASE_DIALECT || 'sqlite',
-    logging: !!parseInt(process.env.DATABASE_LOGGING || 0),
+    logging: !!parseInt(process.env.DATABASE_LOGGING || 0),
     port: process.env.DATABASE_PORT,
     storage: (process.env.DATABASE_STORAGE === ':memory:' ? ':memory:' : `${__dirname}/../../${process.env.DATABASE_STORAGE || 'data/db.sqlite'}`),
     define: {
