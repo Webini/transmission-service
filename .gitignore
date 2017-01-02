@@ -4,3 +4,4 @@ data/*.sqlite
 src/config
 sequelize.migrate
 .vscode
+.directory

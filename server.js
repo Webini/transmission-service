@@ -2,7 +2,7 @@ require('dotenv').config();
 const argv           = require('yargs').argv;
 const migrate        = require('./src/migrate.js');
 const winston        = require('winston');
-const tcpPortUsed    = require('tcp-port-used');
+const waitForIt      = require('./src/utils/waitForIt.js');
 const url            = require('url');
 const LOG_PREFIX     = 'TransmissionService';
 
@@ -36,23 +36,8 @@ function waitRabbit() {
   if (rabbitUrl === null) {
     return Promise.resolve();
   } 
-
-  return new Promise((resolve, reject) => {
-    tcpPortUsed.waitUntilUsedOnHost(
-      rabbitUrl.port || 5672, 
-      rabbitUrl.hostname, 
-      500, 
-      60000
-    ).then(
-      () => { 
-        console.log('RabbitMQ is up !'); 
-        setTimeout(() => resolve(), 5000);
-      }, 
-      (err) => { 
-        reject(err);
-      }
-    );
-  });
+  
+  return waitForIt(rabbitUrl.hostname, rabbitUrl.port || 5672, 60000, 5000);
 }
 
 if (argv['run-with-migrations']) {

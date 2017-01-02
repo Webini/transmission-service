@@ -16,7 +16,7 @@ const umzug   = new Umzug({
 module.exports = function() {
   return umzug.up().then((migrations) => {
     if (migrations.length <= 0) {
-      console.log('You db is up to date');
+      console.log('Your db is up to date');
     } else {
       migrations.forEach((migration) => {
         console.log(`Migration ${migration.file} done.`);
