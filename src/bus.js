@@ -26,6 +26,8 @@ if (!RABBITMQ_URL) {
     assertQueuesOnFirstSend: true
   });
 
+  inst.use(inst.correlate());
+
   inst._publish = inst.publish;
   inst.publish = function(queueName, message, options, cb) {
     const newOptions = options || defaultOptions;

@@ -2,14 +2,16 @@ FROM node:7.2.0
 
 ENV SERVER_PORT 8080
 ENV SERVER_HOST 0.0.0.0
-ENV DATABASE_STORAGE data/transmission.sqlite
 ENV UPLOAD_PATH /var/tmp/transmission-uploads
+ENV DATABASE_STORAGE data/transmission.sqlite
 ENV DATABASE_DIALECT sqlite
 ENV DATABASE_LOGGING 0
-ENV TRANSMISSION_HOST=transmission.host
-ENV TRANSMISSION_PORT=9091
-ENV TRANSMISSION_USER=transmission
-ENV TRANSMISSION_PASSWORD=transmission
+ENV DATABASE transmission
+ENV TRANSMISSION_HOST transmission.host
+ENV TRANSMISSION_PORT 9091
+ENV TRANSMISSION_USER transmission
+ENV TRANSMISSION_PASSWORD transmission
+ENV RABBITMQ_EXCHANGE transmission-service
 
 VOLUME [ "/home/node/transmission-service/data" ]
 
