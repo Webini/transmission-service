@@ -4,6 +4,7 @@ const EventEmitter  = require('events');
 const LOG_PREFIX    = 'FileEmitter';
 const diff          = require('object-diff');
 const bus           = require('../bus.js');
+const winston        = require('winston');
 
 const EVENTS = {
   CREATED: 'file.created',
@@ -71,17 +72,17 @@ class TorrentEmitter extends EventEmitter {
 
   emit(eventName, ...args) {
     switch(eventName) {
-      case UpdaterEvents.CREATED:
-        return this._processCreated.apply(this, args);
+    case UpdaterEvents.CREATED:
+      return this._processCreated.apply(this, args);
 
-      case UpdaterEvents.UPDATED:
-        return this._processUpdated.apply(this, args);
+    case UpdaterEvents.UPDATED:
+      return this._processUpdated.apply(this, args);
 
-      case UpdaterEvents.DELETED:
-        return this._processDeleted.apply(this, args);
+    case UpdaterEvents.DELETED:
+      return this._processDeleted.apply(this, args);
 
-      default:
-        winston.log(LOG_PREFIX, { msg: 'Event not found', type: eventName, args: args });
+    default:
+      winston.log(LOG_PREFIX, { msg: 'Event not found', type: eventName, args: args });
     }
   }
 }
