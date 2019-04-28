@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(item) {
   if (item['updatedAt']) {
     return item['updatedAt'];

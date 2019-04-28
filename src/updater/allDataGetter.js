@@ -7,15 +7,10 @@
  */
 module.exports = function(model) {
   /**
-   * It should always return a promise 
+   * It should always return a promise
    * @return {Promise}
    */
-  return function(conf, rawParent) {
-    return model.findAll()
-      .then((elements) => {
-        return elements.map((element) => {
-          return element.toJSON();
-        });
-      });
-  };
+  // eslint-disable-next-line
+  return (conf, rawParent) =>
+    model.findAll().then(elements => elements.map(element => element.toJSON()));
 };

@@ -5,10 +5,16 @@ const tcpPortUsed = require('tcp-port-used');
  * @param {integer} port
  * @param {integer} timeout
  * @param {integer} afterWait When host is up wait X ms and resolve Promise
- * @param {integer} retryEach retry each X ms 
+ * @param {integer} retryEach retry each X ms
  * @returns {Promise}
  */
-module.exports = function(host, port, timeout, afterWait = null, retryEach = 500) {
+module.exports = function(
+  host,
+  port,
+  timeout,
+  afterWait = null,
+  retryEach = 500,
+) {
   return new Promise((resolve, reject) => {
     tcpPortUsed
       .waitUntilUsedOnHost(port, host, retryEach, timeout)
@@ -19,6 +25,6 @@ module.exports = function(host, port, timeout, afterWait = null, retryEach = 500
           resolve();
         }
       })
-      .catch((err) => reject(err));
+      .catch(err => reject(err));
   });
 };

@@ -1,15 +1,14 @@
-'use strict';
-
 /**
- * Create a new model deletor 
+ * Create a new model deletor
  * @param {Sequelize.Model} model
  * @return {Function}
  */
 module.exports = function(model, idField = 'id') {
   /**
-   * It should always return a promise 
+   * It should always return a promise
    * @return {Promise}
    */
+  // eslint-disable-next-line
   return function(rawElement, rawParent) {
     const id = rawElement[idField];
 
@@ -17,10 +16,6 @@ module.exports = function(model, idField = 'id') {
       return Promise.reject(new Error(`Id ${idField} not found`));
     }
 
-    return model
-      .findById(id)
-      .then((elem) => {
-        return elem.destroy();
-      });
+    return model.findById(id).then(elem => elem.destroy());
   };
 };

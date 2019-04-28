@@ -1,18 +1,16 @@
-'use strict';
-
 const RABBITMQ_EXCHANGE = process.env.RABBITMQ_EXCHANGE || 'amq.topic';
-const RABBITMQ_URL     = process.env.RABBITMQ_URL;
-const LOG_PREFIX       = 'RabbitMQBus';
-const winston          = require('winston');
-const bus              = require('servicebus');
+const RABBITMQ_URL = process.env.RABBITMQ_URL;
+const LOG_PREFIX = 'RabbitMQBus';
+const winston = require('winston');
+const bus = require('servicebus');
 
-const defaultOptions   = { 
+const defaultOptions = {
   exchangeName: RABBITMQ_EXCHANGE,
   exchangeOptions: {
     durable: true,
     type: 'topic',
-    autoDelete: false
-  }
+    autoDelete: false,
+  },
 };
 
 if (!RABBITMQ_URL) {
@@ -23,7 +21,7 @@ if (!RABBITMQ_URL) {
     log: function(...args) {
       winston.info(LOG_PREFIX, args);
     },
-    assertQueuesOnFirstSend: true
+    assertQueuesOnFirstSend: true,
   });
 
   inst.use(inst.correlate());
@@ -31,7 +29,7 @@ if (!RABBITMQ_URL) {
   inst._publish = inst.publish;
   inst.publish = function(queueName, message, options, cb) {
     const newOptions = options || defaultOptions;
-    this._publish.apply(this, [ queueName, message, newOptions, cb ]);
+    this._publish.apply(this, [queueName, message, newOptions, cb]);
   };
 
   module.exports = inst;

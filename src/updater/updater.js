@@ -1,31 +1,27 @@
-'use strict';
-
-const EventEmitter         = require('events');
+const EventEmitter = require('events');
 const defaultSyncTagGetter = require('./defaultSyncTagGetter.js');
-const assert               = require('assert');
+const assert = require('assert');
 const EVENTS = {
   CREATED: 'created',
   UPDATED: 'updated',
-  DELETED: 'deleted'
+  DELETED: 'deleted',
 };
 
 function prepareChilds(rawObject, childsConf) {
   const promises = [];
 
-  for(const field in childsConf) {
+  for (const field in childsConf) {
     const conf = childsConf[field];
 
     rawObject[conf.symbol] = new Updater(
-      Object.assign({ parent: rawObject }, conf)
+      Object.assign({ parent: rawObject }, conf),
     );
-    
-    promises.push(
-      rawObject[conf.symbol].init()
-    );
+
+    promises.push(rawObject[conf.symbol].init());
   }
 
   return Promise.all(promises);
-} 
+}
 
 /**
  * Extract id from object
@@ -49,23 +45,23 @@ function getId(object, idField, thrown = true) {
 }
 
 /**
- * Apply syncTags on object 
- * @param {Object} object 
+ * Apply syncTags on object
+ * @param {Object} object
  * @param {Callback} syncTagGetter
  * @param {String|Symbol} syncTagField
  */
 function applySyncTag(object, syncTagGetter, syncTagField) {
-  object[syncTagField] = syncTagGetter(object); 
+  object[syncTagField] = syncTagGetter(object);
 }
 
 /**
  * Apply syncTags on object of object or array
- * @param {Object} objects 
+ * @param {Object} objects
  * @param {Callback} syncTagGetter
  * @param {String|Symbol} syncTagField
  */
 function applySyncTags(objects, syncTagGetter, syncTagField) {
-  for(const i in objects) {
+  for (const i in objects) {
     applySyncTag(objects[i], syncTagGetter, syncTagField);
   }
 }
@@ -79,7 +75,7 @@ function applySyncTags(objects, syncTagGetter, syncTagField) {
 function extractIds(objects, idField) {
   const ids = [];
 
-  for(const i in objects) {
+  for (const i in objects) {
     ids.push(getId(objects[i], idField));
   }
 
@@ -100,36 +96,46 @@ class Updater {
    * @param {string|Symbol} [config.syncTagField=Symbol()] Key name where the syncTag will be save
    */
   constructor(config) {
-    const { 
-      modelDataGetter, idField, syncTagGetter, 
-      childs, parent, modelCreateCb, modelDeleteCb, 
-      modelUpdateCb, syncTagField, emitter,
-    } = Object.assign({ 
-      syncTagGetter: defaultSyncTagGetter, 
-      childs: {},
-      idField: 'id',
-      syncTagField: Symbol('syncTag')
-    }, config);
+    const {
+      modelDataGetter,
+      idField,
+      syncTagGetter,
+      childs,
+      parent,
+      modelCreateCb,
+      modelDeleteCb,
+      modelUpdateCb,
+      syncTagField,
+      emitter,
+    } = Object.assign(
+      {
+        syncTagGetter: defaultSyncTagGetter,
+        childs: {},
+        idField: 'id',
+        syncTagField: Symbol('syncTag'),
+      },
+      config,
+    );
 
     assert(modelDataGetter, 'modelDataGetter is required to use Updater');
     assert(modelDeleteCb, 'modelDeleteCb is required to use Updater');
     assert(modelCreateCb, 'modelCreateCb is required to use Updater');
     assert(modelUpdateCb, 'modelUpdateCb is required to use Updater');
 
-    this.emitter         = emitter || new EventEmitter;
-    this.syncTagGetter   = syncTagGetter;
-    this.syncTagField    = syncTagField;
-    this.childs          = childs;
-    this.idField         = idField;
-    this.modelDeleteCb   = modelDeleteCb;
-    this.modelCreateCb   = modelCreateCb;
-    this.modelUpdateCb   = modelUpdateCb;
+    this.emitter = emitter || new EventEmitter();
+    this.syncTagGetter = syncTagGetter;
+    this.syncTagField = syncTagField;
+    this.childs = childs;
+    this.idField = idField;
+    this.modelDeleteCb = modelDeleteCb;
+    this.modelCreateCb = modelCreateCb;
+    this.modelUpdateCb = modelUpdateCb;
     this.modelDataGetter = modelDataGetter;
-    this.initialized     = false;
-    this.parent          = parent;
-    this.objects         = []; 
-    this.objectsIds      = []; 
-    this.config          = config;
+    this.initialized = false;
+    this.parent = parent;
+    this.objects = [];
+    this.objectsIds = [];
+    this.config = config;
 
     //init childs symbols
     for (const key in this.childs) {
@@ -146,10 +152,10 @@ class Updater {
   init() {
     if (!this.initialized) {
       this.initialized = this.modelDataGetter(this.config, this.parent)
-        .then((elements) => {
+        .then(elements => {
           const ePromises = [];
 
-          elements.forEach((element) => {
+          elements.forEach(element => {
             ePromises.push(this._create(element));
           });
 
@@ -159,7 +165,7 @@ class Updater {
           this.objectsIds = extractIds(this.objects, this.idField);
           this.config = null;
 
-          return this; 
+          return this;
         });
     }
 
@@ -168,7 +174,7 @@ class Updater {
 
   /**
    * get all events types
-   * @return {Object} key => name 
+   * @return {Object} key => name
    */
   static get EVENTS() {
     return EVENTS;
@@ -187,29 +193,27 @@ class Updater {
    */
   _updateElement(referenceElement, newElement) {
     return this.modelUpdateCb(referenceElement, newElement, this.parent)
-      .then((element) => {
+      .then(element => {
         const promises = [];
-        
+
         for (const key in this.childs) {
           const conf = this.childs[key];
           element[conf.symbol] = referenceElement[conf.symbol];
 
           promises.push(
-            element[conf.symbol]
-              .update(element[key])
-              .then((updater) => {
-                element[key] = updater.elements;
-              })
+            element[conf.symbol].update(element[key]).then(updater => {
+              element[key] = updater.elements;
+            }),
           );
         }
 
         applySyncTag(element, this.syncTagGetter, this.syncTagField);
         const offset = this.objects.indexOf(referenceElement);
         this.objects[offset] = element;
-        
+
         return Promise.all(promises).then(() => element);
       })
-      .then((element) => {
+      .then(element => {
         this.emitter.emit(EVENTS.UPDATED, element, referenceElement);
       });
     //@todo fire event
@@ -231,18 +235,17 @@ class Updater {
 
     const offset = this.objects.indexOf(element);
     this.objects.splice(offset, 1);
-    
+
     promises.push(this.modelDeleteCb(element, this.parent));
 
-    return Promise.all(promises)
-      .then(() => {
-        this.emitter.emit(EVENTS.DELETED, element);
-      });
+    return Promise.all(promises).then(() => {
+      this.emitter.emit(EVENTS.DELETED, element);
+    });
   }
 
   _create(element, dispatchEvent) {
     this.objects.push(element);
-    
+
     return prepareChilds(element, this.childs) //create the childs updater
       .then(() => {
         const promises = [];
@@ -262,11 +265,9 @@ class Updater {
             element[key] = updater.elements;
           } else {
             promises.push(
-              element[conf.symbol]
-                .update(element[key])
-                .then((updater) => {
-                  element[key] = updater.elements;
-                })
+              element[conf.symbol].update(element[key]).then(updater => {
+                element[key] = updater.elements;
+              }),
             );
           }
         }
@@ -281,10 +282,9 @@ class Updater {
    * @return {Promise}
    */
   _createElement(rawElement) {
-    return this.modelCreateCb(rawElement, this.parent)
-               .then((element) => {
-                 return this._create(element, true);
-               });
+    return this.modelCreateCb(rawElement, this.parent).then(element =>
+      this._create(element, true),
+    );
   }
 
   /**
@@ -308,62 +308,62 @@ class Updater {
 
   update(newElements) {
     if (!this.initialized) {
-      return this.init()
-                 .then(() => this.update(newElements));
+      return this.init().then(() => this.update(newElements));
     }
 
     newElements = newElements || [];
     // avant de commencer les updates() on doit impérativement avoir un retour de la DB
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       //processing des syncTags
       applySyncTags(newElements, this.syncTagGetter, this.syncTagField);
-      
-      const toAdd    = [];
-      const done     = [];
+
+      const toAdd = [];
+      const done = [];
       const promises = [];
 
-      for(const i in newElements) {
-        const newElement     = newElements[i];
-        const id             = getId(newElements[i], this.idField, false);
+      for (const i in newElements) {
+        const newElement = newElements[i];
+        const id = getId(newElements[i], this.idField, false);
         let referenceElement = null;
 
         /**
          * newElement can be new if id is unset or if we haven't the element
          * in our array (in the case of third party id generation).
-         * */ 
+         * */
+
         if (id === null || (referenceElement = this.get(id)) === null) {
           toAdd.push(newElement);
           continue;
         }
-        
-        //check si notre syncTag a changé 
-        if (newElement[this.syncTagField] !== referenceElement[this.syncTagField]) {
+
+        //check si notre syncTag a changé
+        if (
+          newElement[this.syncTagField] !== referenceElement[this.syncTagField]
+        ) {
           promises.push(this._updateElement(referenceElement, newElement));
         }
-        
+
         done.push(id);
       }
 
-      const deletedElements = this.objectsIds.filter((id) => {
-        return (done.indexOf(id) === -1);
-      });
+      const deletedElements = this.objectsIds.filter(
+        id => done.indexOf(id) === -1,
+      );
 
-      deletedElements.forEach((id) => {
+      deletedElements.forEach(id => {
         const element = this.get(id);
         promises.push(this._deleteElement(element));
       });
 
-      toAdd.forEach((element) => {
+      toAdd.forEach(element => {
         promises.push(this._createElement(element));
       });
 
       resolve(
-        Promise
-          .all(promises)
-          .then(() => {
-            this.objectsIds = extractIds(this.objects, this.idField);
-            return this;
-          })
+        Promise.all(promises).then(() => {
+          this.objectsIds = extractIds(this.objects, this.idField);
+          return this;
+        }),
       );
     });
   }

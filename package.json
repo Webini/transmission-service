@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "node node_modules/mocha/bin/mocha"
+    "test": "node node_modules/mocha/bin/mocha",
+    "lint": "NODE_ENV=development eslint --ignore-path .gitignore --ignore-path .eslintignore ./"
   },
   "repository": {
     "type": "git",
@@ -34,7 +35,10 @@
     "yargs": "^6.5.0"
   },
   "devDependencies": {
-    "eslint": "^3.11.1",
-    "mocha": "^3.2.0"
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "mocha": "^3.2.0",
+    "prettier": "^1.17.0"
   }
 }

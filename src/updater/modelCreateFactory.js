@@ -1,27 +1,24 @@
-'use strict';
-
 /**
- * create a new model creator 
+ * create a new model creator
  * @param {Sequelize.Model} model
  * @param {Array[String]} preserveFields rawElement fields to preserve after creation
  * @return {Function}
  */
 module.exports = function(model, preserveFields = []) {
   /**
-   * It should always return a promise 
+   * It should always return a promise
    * @return {Promise}
    */
+  // eslint-disable-next-line
   return function(rawElement, rawParent) {
-    return model
-      .create(rawElement)
-      .then((element) => {
-        const output = element.toJSON();
-        
-        preserveFields.forEach((field) => {
-          output[field] = rawElement[field];
-        });
+    return model.create(rawElement).then(element => {
+      const output = element.toJSON();
 
-        return output;
+      preserveFields.forEach(field => {
+        output[field] = rawElement[field];
       });
+
+      return output;
+    });
   };
 };

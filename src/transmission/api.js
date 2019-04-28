@@ -1,6 +1,4 @@
-'use strict';
-
-const Promise      = require('bluebird');
+const Promise = require('bluebird');
 const Transmission = require('transmission');
 
 Transmission.prototype.methods.torrents.fields = [
@@ -17,12 +15,33 @@ Transmission.prototype.methods.torrents.fields = [
   'startDate', 'status', 'trackers', 'trackerStats', 'totalSize', 'torrentFile', 
   'uploadedEver', 'uploadLimit', 'uploadLimited', 'uploadRatio', 'wanted', 
   'webseeds', 'webseedsSendingToUs' */
-  'trackers', 'hashString', 'name', 'eta', 'status', 'error', 'errorString', 
-  'downloadDir', 'isFinished', 'isStalled', 'desiredAvailable', 'leftUntilDone', 
-  'sizeWhenDone', 'totalSize', 'magnetLink', 'uploadedEver', 'seedRatioLimit', 
-  'seedRatioMode', 'uploadRatio', 'peersConnected', 'peersSendingToUs', 
-  'peersGettingFromUs', 'rateDownload', 'rateUpload', 'activityDate',
-  'files', 'fileStats'
+  'trackers',
+  'hashString',
+  'name',
+  'eta',
+  'status',
+  'error',
+  'errorString',
+  'downloadDir',
+  'isFinished',
+  'isStalled',
+  'desiredAvailable',
+  'leftUntilDone',
+  'sizeWhenDone',
+  'totalSize',
+  'magnetLink',
+  'uploadedEver',
+  'seedRatioLimit',
+  'seedRatioMode',
+  'uploadRatio',
+  'peersConnected',
+  'peersSendingToUs',
+  'peersGettingFromUs',
+  'rateDownload',
+  'rateUpload',
+  'activityDate',
+  'files',
+  'fileStats',
 ];
 
 function create(config) {
@@ -34,7 +53,7 @@ const instance = create({
   port: process.env.TRANSMISSION_PORT,
   username: process.env.TRANSMISSION_USER,
   password: process.env.TRANSMISSION_PASSWORD,
-  url: process.env.TRANSMISSION_URL
+  url: process.env.TRANSMISSION_URL,
 });
 
 instance.create = create;

@@ -1,8 +1,6 @@
 /*global describe,it*/
-'use strict';
-
 const defaultSyncTagGetter = require('../src/updater/defaultSyncTagGetter.js');
-const assert               = require('assert');
+const assert = require('assert');
 
 describe('defaultSyncTagGetter', () => {
   it('should return updatedAt', () => {
@@ -15,5 +13,4 @@ describe('defaultSyncTagGetter', () => {
       defaultSyncTagGetter({});
     });
   });
-
 });

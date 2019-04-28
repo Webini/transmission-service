@@ -1,34 +1,18 @@
 {
-    "env": {
-        "es6": true,
-        "node": true
-    },
-    "extends": "eslint:recommended",
-    "rules": {
-        "indent": [
-            "error",
-            2
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "always"
-        ],
-        "prefer-template": [
-            "error"
-        ],
-        "prefer-arrow-callback": [
-            "error"
-        ],
-        "prefer-const": [ "error" ],
-        "no-var": [ "error" ],
-        "space-before-function-paren": ["error", "never"]
-    }
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "extends": "eslint:recommended",
+  "plugins": ["prettier"],
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "sourceType": "module"
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "no-console": 0,
+    "arrow-body-style": [2, "as-needed"],
+    "arrow-parens": ["error", "as-needed"]
+  }
 }
