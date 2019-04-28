@@ -191,32 +191,34 @@ class Updater {
    * @param {Object} newElement
    * @return {Promise}
    */
-  _updateElement(referenceElement, newElement) {
-    return this.modelUpdateCb(referenceElement, newElement, this.parent)
-      .then(element => {
-        const promises = [];
+  async _updateElement(referenceElement, newElement) {
+    const element = await this.modelUpdateCb(
+      referenceElement,
+      newElement,
+      this.parent,
+    );
 
-        for (const key in this.childs) {
-          const conf = this.childs[key];
-          element[conf.symbol] = referenceElement[conf.symbol];
+    const promises = [];
 
-          promises.push(
-            element[conf.symbol].update(element[key]).then(updater => {
-              element[key] = updater.elements;
-            }),
-          );
-        }
+    for (const key in this.childs) {
+      const conf = this.childs[key];
+      element[conf.symbol] = referenceElement[conf.symbol];
 
-        applySyncTag(element, this.syncTagGetter, this.syncTagField);
-        const offset = this.objects.indexOf(referenceElement);
-        this.objects[offset] = element;
+      promises.push(
+        element[conf.symbol].update(element[key]).then(updater => {
+          element[key] = updater.elements;
+        }),
+      );
+    }
 
-        return Promise.all(promises).then(() => element);
-      })
-      .then(element => {
-        this.emitter.emit(EVENTS.UPDATED, element, referenceElement);
-      });
-    //@todo fire event
+    applySyncTag(element, this.syncTagGetter, this.syncTagField);
+    const offset = this.objects.indexOf(referenceElement);
+    this.objects[offset] = element;
+
+    await Promise.all(promises);
+
+    this.emitter.emit(EVENTS.UPDATED, element, referenceElement);
+    return this;
   }
 
   /**
@@ -224,13 +226,13 @@ class Updater {
    * @param {Object} Element to delete from updater
    * @return {Promise}
    */
-  _deleteElement(element) {
+  async _deleteElement(element) {
     const promises = [];
 
     for (const key in this.childs) {
       const conf = this.childs[key];
       //delete all childs data
-      element[conf.symbol].update([]);
+      promises.push(element[conf.symbol].update([]));
     }
 
     const offset = this.objects.indexOf(element);
@@ -238,42 +240,40 @@ class Updater {
 
     promises.push(this.modelDeleteCb(element, this.parent));
 
-    return Promise.all(promises).then(() => {
-      this.emitter.emit(EVENTS.DELETED, element);
-    });
+    await Promise.all(promises);
+    this.emitter.emit(EVENTS.DELETED, element);
+    return this;
   }
 
-  _create(element, dispatchEvent) {
+  async _create(element, dispatchEvent) {
     this.objects.push(element);
 
-    return prepareChilds(element, this.childs) //create the childs updater
-      .then(() => {
-        const promises = [];
+    await prepareChilds(element, this.childs); //create the childs updater
+    const promises = [];
 
-        applySyncTag(element, this.syncTagGetter, this.syncTagField);
+    applySyncTag(element, this.syncTagGetter, this.syncTagField);
 
-        if (dispatchEvent) {
-          this.emitter.emit(EVENTS.CREATED, element);
-        }
+    if (dispatchEvent) {
+      this.emitter.emit(EVENTS.CREATED, element);
+    }
 
-        //update childs updater with provided data
-        for (const key in this.childs) {
-          const conf = this.childs[key];
-          const updater = element[conf.symbol];
+    //update childs updater with provided data
+    for (const key in this.childs) {
+      const conf = this.childs[key];
+      const updater = element[conf.symbol];
 
-          if (!element[key]) {
+      if (!element[key]) {
+        element[key] = updater.elements;
+      } else {
+        promises.push(
+          element[conf.symbol].update(element[key]).then(updater => {
             element[key] = updater.elements;
-          } else {
-            promises.push(
-              element[conf.symbol].update(element[key]).then(updater => {
-                element[key] = updater.elements;
-              }),
-            );
-          }
-        }
+          }),
+        );
+      }
+    }
 
-        return Promise.all(promises);
-      });
+    return Promise.all(promises);
   }
 
   /**
@@ -281,10 +281,9 @@ class Updater {
    * @param {Object} rawElement
    * @return {Promise}
    */
-  _createElement(rawElement) {
-    return this.modelCreateCb(rawElement, this.parent).then(element =>
-      this._create(element, true),
-    );
+  async _createElement(rawElement) {
+    const element = await this.modelCreateCb(rawElement, this.parent);
+    return this._create(element, true);
   }
 
   /**
@@ -306,66 +305,63 @@ class Updater {
     return object;
   }
 
-  update(newElements) {
+  async update(newElements) {
     if (!this.initialized) {
-      return this.init().then(() => this.update(newElements));
+      await this.init();
     }
 
     newElements = newElements || [];
+
     // avant de commencer les updates() on doit impérativement avoir un retour de la DB
-    return new Promise(resolve => {
-      //processing des syncTags
-      applySyncTags(newElements, this.syncTagGetter, this.syncTagField);
+    // processing des syncTags
+    applySyncTags(newElements, this.syncTagGetter, this.syncTagField);
 
-      const toAdd = [];
-      const done = [];
-      const promises = [];
+    const toAdd = [];
+    const done = [];
+    const promises = [];
 
-      for (const i in newElements) {
-        const newElement = newElements[i];
-        const id = getId(newElements[i], this.idField, false);
-        let referenceElement = null;
+    for (const i in newElements) {
+      const newElement = newElements[i];
+      const id = getId(newElements[i], this.idField, false);
+      let referenceElement = null;
 
-        /**
-         * newElement can be new if id is unset or if we haven't the element
-         * in our array (in the case of third party id generation).
-         * */
+      /**
+       * newElement can be new if id is unset or if we haven't the element
+       * in our array (in the case of third party id generation).
+       * */
 
-        if (id === null || (referenceElement = this.get(id)) === null) {
-          toAdd.push(newElement);
-          continue;
-        }
-
-        //check si notre syncTag a changé
-        if (
-          newElement[this.syncTagField] !== referenceElement[this.syncTagField]
-        ) {
-          promises.push(this._updateElement(referenceElement, newElement));
-        }
-
-        done.push(id);
+      if (id === null || (referenceElement = this.get(id)) === null) {
+        toAdd.push(newElement);
+        continue;
       }
 
-      const deletedElements = this.objectsIds.filter(
-        id => done.indexOf(id) === -1,
-      );
+      //check si notre syncTag a changé
+      if (
+        newElement[this.syncTagField] !== referenceElement[this.syncTagField]
+      ) {
+        promises.push(this._updateElement(referenceElement, newElement));
+      }
 
-      deletedElements.forEach(id => {
-        const element = this.get(id);
-        promises.push(this._deleteElement(element));
-      });
+      done.push(id);
+    }
 
-      toAdd.forEach(element => {
-        promises.push(this._createElement(element));
-      });
+    const deletedElements = this.objectsIds.filter(
+      id => done.indexOf(id) === -1,
+    );
 
-      resolve(
-        Promise.all(promises).then(() => {
-          this.objectsIds = extractIds(this.objects, this.idField);
-          return this;
-        }),
-      );
+    deletedElements.forEach(id => {
+      const element = this.get(id);
+      promises.push(this._deleteElement(element));
     });
+
+    toAdd.forEach(element => {
+      promises.push(this._createElement(element));
+    });
+
+    await Promise.all(promises);
+    this.objectsIds = extractIds(this.objects, this.idField);
+
+    return this;
   }
 
   get elements() {
