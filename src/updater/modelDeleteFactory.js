@@ -16,6 +16,6 @@ module.exports = function(model, idField = 'id') {
       return Promise.reject(new Error(`Id ${idField} not found`));
     }
 
-    return model.findById(id).then(elem => elem.destroy());
+    return model.findByPk(id).then(elem => elem.destroy());
   };
 };

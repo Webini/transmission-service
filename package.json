@@ -25,10 +25,10 @@
     "express": "^4.14.0",
     "multer": "^1.2.0",
     "object-diff": "0.0.3",
-    "sequelize": "^3.34.0",
+    "sequelize": "^6.0.0",
     "servicebus": "^2.0.6",
     "sqlite3": "^4.0.6",
-    "tcp-port-used": "^0.1.2",
+    "tcp-port-used": "^1.0.1",
     "transmission": "^0.4.5",
     "umzug": "^1.11.0",
     "winston": "^2.3.0",
@@ -38,7 +38,7 @@
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "mocha": "^3.2.0",
+    "mocha": "^6.2.2",
     "prettier": "^1.17.0"
   }
 }

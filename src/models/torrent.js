@@ -118,15 +118,6 @@ module.exports = function(sequelize, DataTypes) {
       trackers: DataTypes.VIRTUAL,
     },
     {
-      classMethods: {
-        associate: function(models) {
-          Torrent.hasMany(models.File, {
-            onDelete: 'cascade',
-            hooks: true,
-            foreignKey: 'torrentHash',
-          });
-        },
-      },
       getterMethods: {
         trackersJson: () => undefined,
         trackers: function() {
@@ -144,5 +135,14 @@ module.exports = function(sequelize, DataTypes) {
       },
     },
   );
+
+  Torrent.associate = function(models) {
+    Torrent.hasMany(models.File, {
+      onDelete: 'cascade',
+      hooks: true,
+      foreignKey: 'torrentHash',
+    });
+  };
+
   return Torrent;
 };

@@ -67,13 +67,6 @@ module.exports = function(sequelize, DataTypes) {
       },
     },
     {
-      classMethods: {
-        associate: function(models) {
-          File.belongsTo(models.Torrent, {
-            onDelete: 'CASCADE',
-          });
-        },
-      },
       setterMethods: {
         name: function(value) {
           const directory = path.dirname(value);
@@ -91,5 +84,12 @@ module.exports = function(sequelize, DataTypes) {
       },
     },
   );
+
+  File.associate = function(models) {
+    File.belongsTo(models.Torrent, {
+      onDelete: 'CASCADE',
+    });
+  };
+
   return File;
 };
