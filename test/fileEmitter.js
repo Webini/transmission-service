@@ -32,6 +32,7 @@ describe('FileEmitter', () => {
         type: FileEmitter.EVENTS.CREATED,
         objectId: newFile.id,
         data: newFile,
+        domain: null,
       });
       done();
     });
@@ -53,6 +54,7 @@ describe('FileEmitter', () => {
             bytesCompleted: updatedFile.bytesCompleted,
           },
         },
+        domain: null,
       });
       done();
     });
@@ -67,6 +69,7 @@ describe('FileEmitter', () => {
         type: FileEmitter.EVENTS.DOWNLOADED,
         objectId: newFile.id,
         data: finishedFile,
+        domain: null,
       });
       done();
     });
@@ -81,6 +84,7 @@ describe('FileEmitter', () => {
         type: FileEmitter.EVENTS.DELETED,
         objectId: newFile.id,
         data: newFile,
+        domain: null,
       });
       done();
     });

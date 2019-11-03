@@ -30,6 +30,7 @@ describe('TorrentEmitter', () => {
         type: TorrentEmitter.EVENTS.CREATED,
         objectId: newTorrent.hash,
         data: newTorrent,
+        domain: null,
       });
       done();
     });
@@ -51,6 +52,7 @@ describe('TorrentEmitter', () => {
             leftUntilDone: updatedTorrent.leftUntilDone,
           },
         },
+        domain: null,
       });
       done();
     });
@@ -65,6 +67,7 @@ describe('TorrentEmitter', () => {
         type: TorrentEmitter.EVENTS.DOWNLOADED,
         objectId: newTorrent.hash,
         data: finishedTorrent,
+        domain: null,
       });
       done();
     });
@@ -79,6 +82,7 @@ describe('TorrentEmitter', () => {
         type: TorrentEmitter.EVENTS.DELETED,
         objectId: newTorrent.hash,
         data: newTorrent,
+        domain: null,
       });
       done();
     });

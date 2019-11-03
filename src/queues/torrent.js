@@ -13,6 +13,7 @@ module.exports = process.env.REDIS_HOST
           type: 'exponential',
           delay: 1000,
         },
+        removeOnComplete: 500,
       },
     })
   : null;

@@ -247,15 +247,10 @@ class Updater {
 
   async _create(element, dispatchEvent) {
     this.objects.push(element);
-
     await prepareChilds(element, this.childs); //create the childs updater
     const promises = [];
 
     applySyncTag(element, this.syncTagGetter, this.syncTagField);
-
-    if (dispatchEvent) {
-      this.emitter.emit(EVENTS.CREATED, element);
-    }
 
     //update childs updater with provided data
     for (const key in this.childs) {
@@ -273,7 +268,13 @@ class Updater {
       }
     }
 
-    return Promise.all(promises);
+    const childs = await Promise.all(promises);
+
+    if (dispatchEvent) {
+      this.emitter.emit(EVENTS.CREATED, element);
+    }
+
+    return childs;
   }
 
   /**

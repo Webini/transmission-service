@@ -44,6 +44,7 @@ Environment variables available :
 | ----------------------- | -------------- | ----------- |
 | SERVER_PORT             | 8080           | Http server port |
 | SERVER_HOST             | localhost      | Http server host |
+| DOMAIN                  | null           | Add domain field in messages |
 | TRANSMISSION_HOST       | 127.0.0.1      | Transmission host address |
 | TRANSMISSION_PORT       | 9091           | Transmission api port |
 | TRANSMISSION_USER       | transmission   | Transmission api user |
