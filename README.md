@@ -63,6 +63,7 @@ Environment variables available :
 | REDIS_PORT              |       6379     | Redis port |
 | REDIS_HOST              |                | Redis host | 
 | REDIS_PASSWORD          |                | Redis password | 
+| TRANSMISSION_STORAGE_PATH | /data        | Transmission storage path (used by /storage endpoint for monitoring purpose) |
 ## Volumes
    
 By default the dockerfile expose the database storage ( `/home/node/data` )  
