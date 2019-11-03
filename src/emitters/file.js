@@ -2,14 +2,14 @@ const UpdaterEvents = require('../updater/updater.js').EVENTS;
 const EventEmitter = require('events');
 const LOG_PREFIX = 'FileEmitter';
 const diff = require('object-diff');
-const bus = require('../bus.js');
+const fileQueue = require('../queues/file');
 const winston = require('winston');
 
 const EVENTS = {
-  CREATED: 'file.created',
-  UPDATED: 'file.updated',
-  DELETED: 'file.deleted',
-  DOWNLOADED: 'file.downloaded',
+  CREATED: 'created',
+  UPDATED: 'updated',
+  DELETED: 'deleted',
+  DOWNLOADED: 'downloaded',
 };
 
 class TorrentEmitter extends EventEmitter {
@@ -64,10 +64,10 @@ class TorrentEmitter extends EventEmitter {
   }
 
   _emit(routingKey, event) {
-    if (!bus) {
+    if (!fileQueue) {
       super.emit(routingKey, event);
     } else {
-      bus.publish(routingKey, event);
+      fileQueue.add(routingKey, event);
     }
   }
 

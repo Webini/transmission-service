@@ -13,11 +13,7 @@ const sequelize = new Sequelize(
     logging: !!parseInt(process.env.DATABASE_LOGGING || 0),
     host: process.env.DATABASE_HOST,
     port: process.env.DATABASE_PORT,
-    storage:
-      process.env.DATABASE_STORAGE === ':memory:'
-        ? ':memory:'
-        : `${__dirname}/../../${process.env.DATABASE_STORAGE ||
-            'data/db.sqlite'}`,
+    storage: process.env.DATABASE_STORAGE || ':memory:',
     define: {
       charset: 'utf8',
       collate: 'utf8_general_ci',

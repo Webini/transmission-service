@@ -3,14 +3,14 @@ const argv = require('yargs').argv;
 const migrate = require('./src/migrate.js');
 const winston = require('winston');
 const waitForIt = require('./src/utils/waitForIt.js');
-const url = require('url');
 const LOG_PREFIX = 'TransmissionService';
 
-const rabbitUrl = process.env.RABBITMQ_URL
-  ? url.parse(process.env.RABBITMQ_URL)
-  : null;
+const redisHost = process.env.REDIS_HOST || null;
+const redisPort = process.env.REDIS_PORT;
 const port = process.env.SERVER_PORT || 8080;
 const host = process.env.SERVER_HOST || 'localhost';
+// silly=0(lowest), debug=1, verbose=2, info=3, warn=4, error=5(highest)
+winston.level = process.env.LOG_LEVEL || 'silly';
 
 function runServer() {
   const workerPromise = require('./src/worker.js');
@@ -34,20 +34,20 @@ function runServer() {
     });
 }
 
-function waitRabbit() {
-  if (rabbitUrl === null) {
+function waitRedis() {
+  if (redisHost === null) {
     return Promise.resolve();
   }
 
-  return waitForIt(rabbitUrl.hostname, rabbitUrl.port || 5672, 60000, 5000);
+  return waitForIt(redisHost, redisPort || 6379, 60000, 5000);
 }
 
 if (argv['run-with-migrations']) {
   migrate()
-    .then(waitRabbit)
+    .then(waitRedis)
     .then(runServer);
 } else if (argv['migrate']) {
   migrate();
 } else {
-  waitRabbit().then(runServer);
+  waitRedis().then(runServer);
 }

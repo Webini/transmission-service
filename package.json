@@ -20,8 +20,10 @@
   "dependencies": {
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
+    "bull": "^3.11.0",
     "crc": "^3.4.3",
-    "dotenv": "^2.0.0",
+    "debug": "^4.1.1",
+    "dotenv": "^8.2.0",
     "express": "^4.14.0",
     "multer": "^1.2.0",
     "object-diff": "0.0.3",
@@ -39,6 +41,7 @@
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-prettier": "^3.0.1",
     "mocha": "^6.2.2",
+    "nodemon": "^1.19.4",
     "prettier": "^1.17.0"
   }
 }

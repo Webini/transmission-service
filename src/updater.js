@@ -1,3 +1,4 @@
+const debug = require('debug')('updated');
 const models = require('./models/index.js');
 const Updater = require('./updater/updater.js');
 const oneToManyGetterFactory = require('./updater/oneToManyGetter.js');
@@ -8,34 +9,33 @@ const modelUpdateFactory = require('./updater/modelUpdateFactory.js');
 const crc32 = require('crc').crc32;
 const TorrentEmitter = require('./emitters/torrent.js');
 const FileEmitter = require('./emitters/file.js');
-
 const torrentEmitter = new TorrentEmitter();
 const filesEmitter = new FileEmitter();
 
 torrentEmitter.on(TorrentEmitter.EVENTS.CREATED, event => {
-  console.log(`Torrent ${event.data.name} created #${event.objectId}`);
-}); /*
-torrentEmitter.on(TorrentEmitter.EVENTS.UPDATED, (event) => {
-  console.log(`Torrent ${event.data.new.name} updated #${event.objectId}`);
-});*/
+  debug(`Torrent ${event.data.name} created #${event.objectId}`);
+});
+torrentEmitter.on(TorrentEmitter.EVENTS.UPDATED, event => {
+  debug(`Torrent ${event.data.new.name} updated #${event.objectId}`);
+});
 torrentEmitter.on(TorrentEmitter.EVENTS.DOWNLOADED, event => {
-  console.log(`Torrent ${event.data.name} downloaded #${event.objectId}`);
+  debug(`Torrent ${event.data.name} downloaded #${event.objectId}`);
 });
 torrentEmitter.on(TorrentEmitter.EVENTS.DELETED, event => {
-  console.log(`Torrent ${event.data.name} deleted #${event.objectId}`);
+  debug(`Torrent ${event.data.name} deleted #${event.objectId}`);
 });
 
 filesEmitter.on(FileEmitter.EVENTS.CREATED, event => {
-  console.log(`File ${event.data.name} created #${event.objectId}`);
-}); /*
-filesEmitter.on(FileEmitter.EVENTS.UPDATED, (event) => {
-  console.log(`File ${event.data.new.name} updated #${event.objectId}`);
-});*/
+  debug(`File ${event.data.name} created #${event.objectId}`);
+});
+filesEmitter.on(FileEmitter.EVENTS.UPDATED, event => {
+  debug(`File ${event.data.new.name} updated #${event.objectId}`);
+});
 filesEmitter.on(FileEmitter.EVENTS.DELETED, event => {
-  console.log(`File ${event.data.name} deleted #${event.objectId}`);
+  debug(`File ${event.data.name} deleted #${event.objectId}`);
 });
 filesEmitter.on(FileEmitter.EVENTS.DOWNLOADED, event => {
-  console.log(`File ${event.data.name} downloaded #${event.objectId}`);
+  debug(`File ${event.data.name} downloaded #${event.objectId}`);
 });
 
 module.exports = new Updater({

@@ -3,15 +3,15 @@ const EventEmitter = require('events');
 const LOG_PREFIX = 'TorrentEmitter';
 const diff = require('object-diff');
 const winston = require('winston');
-const bus = require('../bus.js');
+const torrentQueue = require('../queues/torrent');
 
 const IGNORED_FIELDS = ['trackers', 'files'];
 
 const EVENTS = {
-  CREATED: 'torrent.created',
-  UPDATED: 'torrent.updated',
-  DELETED: 'torrent.deleted',
-  DOWNLOADED: 'torrent.downloaded',
+  CREATED: 'created',
+  UPDATED: 'updated',
+  DELETED: 'deleted',
+  DOWNLOADED: 'downloaded',
 };
 
 class TorrentEmitter extends EventEmitter {
@@ -71,10 +71,10 @@ class TorrentEmitter extends EventEmitter {
   }
 
   _emit(routingKey, event) {
-    if (!bus) {
+    if (!torrentQueue) {
       super.emit(routingKey, event);
     } else {
-      bus.publish(routingKey, event);
+      torrentQueue.add(routingKey, event);
     }
   }
 
