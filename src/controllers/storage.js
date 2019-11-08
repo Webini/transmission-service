@@ -1,11 +1,11 @@
-const disk = require('diskusage');
+const transmission = require('../transmission/api.js');
 const LOG_PREFIX = 'StorageController';
 
 module.exports = {
-  get: function(req, res) {
-    disk
-      .check(process.env.TRANSMISSION_STORAGE_PATH)
-      .then(results => res.apiSuccess(results))
+  getFree: function(req, res) {
+    transmission
+      .freeSpaceAsync(process.env.TRANSMISSION_STORAGE_PATH)
+      .then(results => res.apiSuccess(results['size-bytes']))
       .catch(err => res.apiError(LOG_PREFIX, 'Unknown error', err));
   },
 };

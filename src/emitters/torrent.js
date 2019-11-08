@@ -6,7 +6,7 @@ const winston = require('winston');
 const torrentQueue = require('../queues/torrent');
 
 const IGNORED_FIELDS = ['trackers', 'files'];
-const DOMAIN = process.env.DOMAIN || null;
+const HOST_ID = process.env.HOST_ID || null;
 
 const EVENTS = {
   CREATED: 'created',
@@ -26,7 +26,7 @@ class TorrentEmitter extends EventEmitter {
       data: element,
       type: EVENTS.CREATED,
       objectId: element.hash,
-      domain: DOMAIN,
+      hostId: HOST_ID,
     });
   }
 
@@ -47,7 +47,7 @@ class TorrentEmitter extends EventEmitter {
       },
       type: EVENTS.UPDATED,
       objectId: newElement.hash,
-      domain: DOMAIN,
+      hostId: HOST_ID,
     });
 
     if (
@@ -60,7 +60,7 @@ class TorrentEmitter extends EventEmitter {
         data: newElement,
         type: EVENTS.DOWNLOADED,
         objectId: newElement.hash,
-        domain: DOMAIN,
+        hostId: HOST_ID,
       });
     }
   }
@@ -71,7 +71,7 @@ class TorrentEmitter extends EventEmitter {
       data: element,
       type: EVENTS.DELETED,
       objectId: element.hash,
-      domain: DOMAIN,
+      hostId: HOST_ID,
     });
   }
 

@@ -12,7 +12,7 @@ const EVENTS = {
   DOWNLOADED: 'downloaded',
 };
 
-const DOMAIN = process.env.DOMAIN || null;
+const HOST_ID = process.env.HOST_ID || null;
 
 class TorrentEmitter extends EventEmitter {
   static get EVENTS() {
@@ -25,7 +25,7 @@ class TorrentEmitter extends EventEmitter {
       data: element,
       type: EVENTS.CREATED,
       objectId: element.id,
-      domain: DOMAIN,
+      hostId: HOST_ID,
     });
   }
 
@@ -41,7 +41,7 @@ class TorrentEmitter extends EventEmitter {
       },
       type: EVENTS.UPDATED,
       objectId: newElement.id,
-      domain: DOMAIN,
+      hostId: HOST_ID,
     });
 
     if (
@@ -54,7 +54,7 @@ class TorrentEmitter extends EventEmitter {
         data: newElement,
         type: EVENTS.DOWNLOADED,
         objectId: newElement.id,
-        domain: DOMAIN,
+        hostId: HOST_ID,
       });
     }
   }
@@ -65,7 +65,7 @@ class TorrentEmitter extends EventEmitter {
       data: element,
       type: EVENTS.DELETED,
       objectId: element.id,
-      domain: DOMAIN,
+      hostId: HOST_ID,
     });
   }
 
