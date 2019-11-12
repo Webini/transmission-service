@@ -14,8 +14,8 @@ Parameters available  :
 | Name | Action |
 | ---- | ------ |
 | --run-with-migrations | It execute migrations then start the server |
-| --migrate | It will only execute migrations |
-| none | It will start the server without migrations scripts |
+| --migrate | It will only execute migrations |
+| none | It will start the server without migrations scripts |
   
   
     
@@ -25,9 +25,9 @@ API
 | Method | Path          | Description |  
 | ------ | ------------- | ------------ |
 | GET    | /             | return all torrents |   
-| POST   | /torrent      | Add a new torrent <br> - Base46 buffer in html request content ( use content-type text/plain ) <br /> - Or multipart file (field name torrent) | 
-| POST   | /url          | add magnet torrent<br > - post json ```{ "url": "magnet||http" }``` |
-| GET    | /{hash}       | get torrent informations |   
+| POST   | /torrent      | Add a new torrent <br> - Base46 buffer in html request content ( use content-type text/plain ) <br /> - Or multipart file (field name torrent) | 
+| POST   | /url          | add magnet torrent<br > - post json `{ "url": "magnet||http" }` |
+| GET    | /{hash}       | get torrent informations |   
 | POST   | /{hash}/pause | pause torrent |
 | POST   | /{hash}/start | start torrent |
 | POST   | /{hash}/ratio/{ratio} | set torrent ratio |
@@ -64,6 +64,7 @@ Environment variables available :
 | REDIS_HOST              |                | Redis host | 
 | REDIS_PASSWORD          |                | Redis password | 
 | TRANSMISSION_STORAGE_PATH | /data        | Transmission storage path (used by /storage endpoint for monitoring purpose) |
+| HOST_ID                 |                | Host ID, you can provide anything here, it will be passed to events |
 ## Volumes
    
 By default the dockerfile expose the database storage ( `/home/node/data` )  
@@ -84,6 +85,7 @@ If environment variable REDIS_HOST is set, this server will publish events to re
 | date     | Event creation date                 |
 | data     | Event data, see description below   |
 | type     | Event type, same as routing key     |
+| hostId   | Host ID provided in env variable    |
 | objectId | ObjectId associated with this event |
 
 
@@ -93,12 +95,12 @@ If environment variable REDIS_HOST is set, this server will publish events to re
 | Queue name | Job type           | Data field | Description |
 | ---------- | ------------------ | ---------- | ----------- | 
 | file       | created       | Same structure as file model | Fired when a new file is created | 
-| file       | updated       | ```{ new: { File model }, old: { File model }, diff: { field => | value that differ from old model } }``` | Fired when the file is updated |
-| file       | deleted       | Same structure as file model | Fired when the file is deleted |
+| file       | updated       | `{ new: { File model }, old: { File model }, diff: { field => | value that differ from old model } }` | Fired when the file is updated |
+| file       | deleted       | Same structure as file model | Fired when the file is deleted |
 | file       | downloaded    | Same structure as file model | Fired when the file has finished | downloading |
 | torrent    | created    | Same structure as torrent model | Fired when a new torrent is | created | 
-| torrent    | updated    | ```{ new: { torrent model }, old: { torrent model }, diff: { field | => value that differ from old model } }``` | Fired when the torrent is updated |
-| torrent    | deleted    | Same structure as torrent model | Fired when the torrent is deleted |
+| torrent    | updated    | `{ new: { torrent model }, old: { torrent model }, diff: { field | => value that differ from old model } }` | Fired when the torrent is updated |
+| torrent    | deleted    | Same structure as torrent model | Fired when the torrent is deleted |
 | torrent    | downloaded | Same structure as torrent model | Fired when the torrent has finished downloading |
 
 
