@@ -252,6 +252,10 @@ class Updater {
 
     applySyncTag(element, this.syncTagGetter, this.syncTagField);
 
+    if (dispatchEvent) {
+      this.emitter.emit(EVENTS.CREATED, element);
+    }
+
     //update childs updater with provided data
     for (const key in this.childs) {
       const conf = this.childs[key];
@@ -268,13 +272,7 @@ class Updater {
       }
     }
 
-    const childs = await Promise.all(promises);
-
-    if (dispatchEvent) {
-      this.emitter.emit(EVENTS.CREATED, element);
-    }
-
-    return childs;
+    return Promise.all(promises);
   }
 
   /**
