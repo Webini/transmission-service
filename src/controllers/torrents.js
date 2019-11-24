@@ -23,7 +23,7 @@ module.exports = {
     if (promise) {
       promise
         .then(data => res.apiSuccess(data))
-        .catch(err => res.apiError(LOG_PREFIX, 'Invalid torrent', err));
+        .catch(err => res.apiError(LOG_PREFIX, 'Invalid torrent', err, 422));
     } else {
       res.apiError(LOG_PREFIX, 'Torrent data not found');
     }
@@ -37,6 +37,6 @@ module.exports = {
     transmission
       .addUrlAsync(req.body.url)
       .then(data => res.apiSuccess(data))
-      .catch(err => res.apiError(LOG_PREFIX, 'Invalid url', err));
+      .catch(err => res.apiError(LOG_PREFIX, 'Invalid url', err, 422));
   },
 };
